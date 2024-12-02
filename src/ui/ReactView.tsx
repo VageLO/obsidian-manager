@@ -1,4 +1,10 @@
 export const ReactView = ({ data }) => {
-    console.log(data)
-    return <h4>Hello, React!</h4>;
+    return (
+		<div>
+		{data[0].values.map((item) => (
+			<h4 key={item[0]}>{item[1]}</h4>
+		))
+		}
+		</div>
+	);
 };

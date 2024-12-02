@@ -28,7 +28,7 @@ export class ExampleView extends ItemView {
 			<StrictMode>
 				<ReactView 
                     data={await this.db.listAccounts()}
-                />,
+                />
 			</StrictMode>,
 		);
 	}
