@@ -1,8 +1,20 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+.transaction-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  padding: 10px;
+  width: 100%;
+}
+.amount, .account {
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 0px;    
+    margin-bottom: 10px;    
+    color: #007bff;
+}
+.date, .operation-type {
+    font-size: 10px;
+    margin: 0px;
+    color: #888;
+}

@@ -2,7 +2,6 @@ import initSqlJs, { BindParams, Database } from 'sql.js'
 import ManagerPlugin from '../main'
 import { App } from 'obsidian'
 import * as methods from './methods'
-import * as accounts from './account'
 
 export class ManagerDatabase {
     plugin: ManagerPlugin
@@ -40,19 +39,9 @@ export class ManagerDatabase {
     }
 }
 
-Object.entries(accounts).forEach(([name, account]) => {
-    ManagerDatabase.prototype[name] = account
-})
-
 Object.entries(methods).forEach(([name, method]) => {
     ManagerDatabase.prototype[name] = method 
 })
-
-type Accounts = typeof accounts;
-declare module './database' {
-    interface ManagerDatabase extends Accounts {
-    }
-}
 
 type Methods = typeof methods;
 declare module './database' {
