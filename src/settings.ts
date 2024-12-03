@@ -1,4 +1,5 @@
-import { App, PluginSettingTab, Setting } from 'obsidian'
+import { App, Notice, PluginSettingTab, Setting } from 'obsidian'
+import { VIEW_TYPE_EXAMPLE } from './ui/view';
 import ManagerPlugin from './main'
 
 export interface ManagerSettings {
@@ -17,7 +18,8 @@ export class ManagerSettingTab extends PluginSettingTab {
     }
     
     display (): void {
-        const { containerEl } = this
+        const { containerEl, plugin, app } = this
+        const { adapter } = app.vault
         
         containerEl.empty()
         new Setting(containerEl)
@@ -25,10 +27,18 @@ export class ManagerSettingTab extends PluginSettingTab {
             .setDesc('Database file path')
             .addText((text) =>
               text
-                .setValue(this.plugin.settings.databasePath)
+                .setValue(plugin.settings.databasePath)
                 .onChange(async (value) => {
-                    this.plugin.settings.databasePath = value;
-                    await this.plugin.saveSettings();
+                    value = value.trim()
+                    const path = adapter.path.join(adapter.basePath, plugin.database.pluginFile(value))
+                    if (!adapter.fs.existsSync(path) || value == '')
+                        return
+
+                    new Notice(`${value} loaded`)
+                    plugin.settings.databasePath = value;
+                    await plugin.saveSettings();
+                    await plugin.loadDatabase();
+                    await plugin.activateView();
                 })
             );
     }
