@@ -33,6 +33,7 @@ export class ExampleView extends ItemView {
                 />
                 <List
                     transactions={await this.db.listTransactions()}
+					db={this.db}
                 />
 			</StrictMode>,
 		);

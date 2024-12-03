@@ -1,18 +1,27 @@
 import React from 'react';
+import { EditModal } from './modal';
 
-export const List = ({ transactions }) => {
-    transactions = transactions[0]
-    console.log(transactions)
+export const List = ({ transactions, db }) => {
+	const { app, plugin } = db
     return (
 		<div style={{margin: '10px'}}>
-            {transactions.values.map((item) => (
-                <div className="transaction-card">
-                    <p className="account">{item[9]}</p>
-                    <p className="amount">{item[6]}</p>
-                    <p className="date">{item[5]}</p>
-                    <p className="operation-type">{item[4]}</p>
-                </div>
-            ))}
+            {transactions.map((transaction) => {
+                return (
+					<div className="transaction-card">
+						<p className="account">{transaction.from_account}</p>
+                    	<p className="amount">{transaction.amount} {transactions.from_account_currency}</p>
+                    	<p className="date">{transaction.date}</p>
+                    	<p className="operation-type">{transaction.operation_type}</p>
+
+						<button key={transaction.id} onClick={(e) => {
+							new EditModal(app, plugin.database, transaction).open()
+						}}>
+							Edit
+						</button>	
+					</div>
+				)
+			})}
+			
 		</div>
 	);
 };

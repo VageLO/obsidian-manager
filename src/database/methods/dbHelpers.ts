@@ -24,3 +24,18 @@ export function pluginFile (this: ManagerDatabase, filename: string, absolute = 
     if (absolute) path.unshift(this.app.vault.adapter.basePath)
         return path.join('/')
 }
+
+export function createObjFromArray(obj: {columns: any[], values: any[]}) : any[] {
+	const { columns, values } = obj
+	const transactions = []
+
+	values.forEach((value) => {
+		const obj = columns.reduce((acc, column, index) => {
+			acc[column] = value[index];
+			return acc;
+		}, {});
+		transactions.push(obj)
+	})
+
+	return transactions
+}
