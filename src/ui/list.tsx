@@ -1,6 +1,10 @@
 import { React , useState, useEffect, useContext } from 'react';
-import { EditModal } from './modal';
+import { editTransaction } from './transactionEditModal';
+import { createAccount } from './accountCreateModal';
+import { createCategory } from './categoryCreateModal';
 import { ResourcesContext } from './view';
+import { Utils } from './utils';
+import { EditModal } from './modal';
 
 const success_color = "var(--text-success)"
 const error_color = "var(--text-error)"
@@ -26,27 +30,23 @@ const searchById = (array: number[], id: number) : number => {
     return index
 }
 
-
-
 export const List = () => {
 
     const { transactions, db } = useContext(ResourcesContext)
 	const { app, plugin } = db
 
-    const [state, setState] = useState(transactions)
+    const [stateTransactions, setStateTransactions] = useState(transactions)
 
     const [transactionId, setTransactionId] = useState([])
-    const transactionIndex = []
 
     const [mult, setMult] = useState(false)
 
-    useEffect(() => {
-        console.log('use', state, transactions)
-    }, [state, mult])
+    useEffect(() => {}, [stateTransactions, mult])
 
-    const removeFromState = (index) => {
-        setState(prev => prev.filter((_, i) => i != index));
+    const removeFromState = (id) => {
+        setStateTransactions(prev => prev.filter((item, _) => item.id != id));
     }
+
     return (
 		<div style={{margin: '10px'}}>
             <button
@@ -59,15 +59,19 @@ export const List = () => {
             <button
                 title="Delete Selected"
                 onClick={async(e) => {
+					// TODO: uncommit later
                     //await db.deleteTransactions([transactionId])
-                    transactionIndex.forEach((index) => {
-                        removeFromState(index)
+                    transactionId.forEach((id) => {
+                        removeFromState(id)
                     })
+					setMult(false)
 			    }}>
 			    🚽
 			</button> : ""}
 
-            {transactions.map((transaction, index) => {
+			<Utils/>
+
+            {stateTransactions.map((transaction, index) => {
                 return (
 					<div className="transaction-card" key={transaction.id}>
 						<div className="account">
@@ -93,24 +97,26 @@ export const List = () => {
                     	<p className="operation-type">{transaction.transaction_type}</p>
                     	<p className="desc">{transaction.description}</p>
 
-						<button
+						{!mult ? <button
                             title="Edit"
                             onClick={(e) => {
-							    new EditModal(app, plugin.database, transaction).open()
+							    const modal = new EditModal(app, plugin.database, editTransaction)
+								modal.load(transaction)
+								modal.open()
 						    }}
                         >
 						    📝
-						</button>
-                        <button
+						</button> : ""}
+						{!mult ? <button
                             title="Delete"
                             onClick={async(e) => {
+								//TODO: uncommit later
                                 //await db.deleteTransactions([transaction.id])
-                                //setState(transactions.splice(index, 1))
-                                removeFromState(index)
+                                removeFromState(transaction.id)
 						    }}
                         >
 						    🚽
-						</button>
+						</button> : ""}
 
                         {mult ?
                         <input
@@ -121,19 +127,15 @@ export const List = () => {
                                 const id = +e.target.id
 
                                 const tId = searchById(transactionId, id)
-                                const tIndex = searchById(transactionIndex, index)
 
                                 if (e.target.checked) {
                                     transactionId.push(id)
-                                    transactionIndex.push(index)
                                     setTransactionId(transactionId)
                                 }
                                 else if(tId != -1 || tIndex != -1) {
                                     transactionId.splice(tId, 1)
-                                    transactionIndex.splice(tIndex, 1)
                                     setTransactionId(transactionId)
                                 }
-                                //console.log(transactionId, transactionIndex)
                             }}
                         /> : ""}
 					</div>
