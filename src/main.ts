@@ -1,5 +1,5 @@
 import { DEFAULT_SETTINGS, ManagerSettings, ManagerSettingTab} from './settings'
-import { ExampleView, VIEW_TYPE_EXAMPLE } from './ui/view';
+import { ManagerView, VIEW_TYPE } from './ui/view';
 import { Plugin, WorkspaceLeaf, addIcon, Notice } from 'obsidian'
 import { ManagerDatabase } from './database'
 import { BindParams } from 'sql.js'
@@ -18,8 +18,8 @@ export default class ManagerPlugin extends Plugin {
             new Notice(`Error: ${err.message}`)
 
         this.registerView(
-            VIEW_TYPE_EXAMPLE,
-            (leaf) => new ExampleView(leaf, this.database)
+            VIEW_TYPE,
+            (leaf) => new ManagerView(leaf, this.database)
         );
 
         const ribbon = require('./icons.json').ribbon
@@ -50,7 +50,6 @@ export default class ManagerPlugin extends Plugin {
     }
     
     async query (sql: string, params?: BindParams) {
-        console.log('ManagerPlugin', this)
         return this.database.query(sql, params)
     }
 
@@ -58,14 +57,14 @@ export default class ManagerPlugin extends Plugin {
         const { workspace } = this.app;
 
         let leaf: WorkspaceLeaf | null = null;
-        const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
+        const leaves = workspace.getLeavesOfType(VIEW_TYPE);
 
         if (leaves.length > 0) {
             leaf = leaves[0];
             leaf.rebuildView();
         } else {
             leaf = workspace.getRightLeaf(false);
-            await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true });
+            await leaf.setViewState({ type: VIEW_TYPE, active: true });
         }
 
         workspace.revealLeaf(leaf);

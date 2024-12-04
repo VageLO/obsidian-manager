@@ -1,19 +1,28 @@
 .transaction-card {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
-  padding: 10px;
-  width: 100%;
+    background-color: var(--background-primary);
+    border-color: var(--background-modifier-border-focus);
+    border-style: solid;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 100%;
+    display: block-grid;
 }
 .amount, .account {
     font-size: 15px;
     font-weight: bold;
-    margin-top: 0px;    
-    margin-bottom: 10px;    
-    color: #007bff;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    display: block;
 }
-.date, .operation-type {
+.account > p {
+    display: inline;
+}
+.amount > p {
+    display: inline;
+}
+.date, .operation-type, .desc {
     font-size: 10px;
     margin: 0px;
     color: #888;

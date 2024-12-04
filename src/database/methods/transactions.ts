@@ -29,7 +29,17 @@ INNER JOIN Accounts as to_account ON to_account.id = Transactions.to_account_id
 WHERE Transactions.to_account_id IS NOT NULL
 ORDER BY Transactions.date DESC;`)
 	
+    if (!res.length)
+        return []
 	const transactions = createObjFromArray(res[0])
 
     return transactions
+}
+
+export async function deleteTransactions(this: ManagerDatabase, ids: number[]) {
+    ids.forEach(async(id) => {
+        const res = this.db.run(`DELETE FROM Transactions WHERE id = ?`, [id])
+        await this.save()
+
+    })
 }

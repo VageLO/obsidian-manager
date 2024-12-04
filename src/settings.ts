@@ -1,5 +1,4 @@
 import { App, Notice, PluginSettingTab, Setting } from 'obsidian'
-import { VIEW_TYPE_EXAMPLE } from './ui/view';
 import ManagerPlugin from './main'
 
 export interface ManagerSettings {

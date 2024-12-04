@@ -1,4 +1,8 @@
-export const Header = ({ accounts, categories }) => {
+import { useContext } from 'react';
+import { ResourcesContext } from './view';
+
+export const Header = () => {
+    const { accounts, categories } = useContext(ResourcesContext)
     return (
 		<div>
             <select>

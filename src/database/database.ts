@@ -34,7 +34,6 @@ export class ManagerDatabase {
     }
   
     async query (sql: string, params?: BindParams) {
-        console.log('ManagerDatabase', this)
         return this.db.exec(sql, params)
     }
 }
