@@ -1,10 +1,11 @@
 import { React , useState, useEffect, useContext } from 'react';
-import { editTransaction } from './transactionEditModal';
-import { createTransaction } from './transactionCreateModal';
-import { createAccount } from './accountCreateModal';
-import { createCategory } from './categoryCreateModal';
+import { 
+    createTransaction,
+    createAccount,
+    createCategory,
+    EditModal,
+} from './modals';
 import { ResourcesContext } from './view';
-import { EditModal } from './modal';
 
 
 export const Utils = () => {

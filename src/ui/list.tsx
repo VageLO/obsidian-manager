@@ -1,10 +1,10 @@
 import { React , useState, useEffect, useContext } from 'react';
-import { editTransaction } from './transactionEditModal';
-import { createAccount } from './accountCreateModal';
-import { createCategory } from './categoryCreateModal';
+import { 
+    editTransaction,
+    EditModal,
+} from './modals';
 import { ResourcesContext } from './view';
 import { Utils } from './utils';
-import { EditModal } from './modal';
 
 const success_color = "var(--text-success)"
 const error_color = "var(--text-error)"

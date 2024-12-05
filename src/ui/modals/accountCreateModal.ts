@@ -35,6 +35,7 @@ export async function createAccount(this: EditModal) {
 		.setName("Balance")
 		.addText((text) => {
 			text
+                .setValue(account.balance.toString())
 				.onChange((value) => {
 					value = +value
 					account.balance = value; 
