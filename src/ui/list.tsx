@@ -1,6 +1,6 @@
 import { React , useState, useEffect, useContext } from 'react';
 import { 
-    editTransaction,
+    transactionModal,
     EditModal,
 } from './modals';
 import { ResourcesContext } from './view';
@@ -30,6 +30,8 @@ const searchById = (array: number[], id: number) : number => {
     return index
 }
 
+
+
 export const List = () => {
 
     const { transactions, db } = useContext(ResourcesContext)
@@ -45,6 +47,14 @@ export const List = () => {
 
     const removeFromState = (id) => {
         setStateTransactions(prev => prev.filter((item, _) => item.id != id));
+    }
+    const callback = (data) => {
+        console.log(data)
+        setStateTransactions(prev => prev.map((item, _) => {
+            if (item.id == data.id) {
+                item = data
+            }
+        }))
     }
 
     return (
@@ -100,7 +110,8 @@ export const List = () => {
 						{!mult ? <button
                             title="Edit"
                             onClick={(e) => {
-							    const modal = new EditModal(app, plugin.database, editTransaction)
+							    const modal = new EditModal(app, plugin.database, transactionModal, 
+                                    (data) => callback(data))
 								modal.load(transaction)
 								modal.open()
 						    }}

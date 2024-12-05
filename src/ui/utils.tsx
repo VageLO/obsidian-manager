@@ -1,6 +1,6 @@
 import { React , useState, useEffect, useContext } from 'react';
 import { 
-    createTransaction,
+    transactionModal,
     createAccount,
     createCategory,
     EditModal,
@@ -36,7 +36,7 @@ export const Utils = () => {
 			<button
                 title="add transaction"
                 onClick={(e) => {
-					const modal = new EditModal(app, plugin.database, createTransaction)
+					const modal = new EditModal(app, plugin.database, transactionModal)
 					modal.load()
 					modal.open()
 				}}>
