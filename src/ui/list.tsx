@@ -1,9 +1,14 @@
-import { React , useState, useEffect, useContext } from 'react';
+import { 
+    React,
+    useState,
+    useEffect,
+    useContext,
+} from 'react';
 import { 
     transactionModal,
     EditModal,
 } from './modals';
-import { ResourcesContext } from './view';
+import { useResourcesContext } from './resourcesProvider';
 import { Utils } from './utils';
 
 const success_color = "var(--text-success)"
@@ -30,31 +35,28 @@ const searchById = (array: number[], id: number) : number => {
     return index
 }
 
-
-
 export const List = () => {
 
-    const { transactions, db } = useContext(ResourcesContext)
+    const { transactions, setTransactions, db } = useResourcesContext()
 	const { app, plugin } = db
-
-    const [stateTransactions, setStateTransactions] = useState(transactions)
 
     const [transactionId, setTransactionId] = useState([])
 
     const [mult, setMult] = useState(false)
 
-    useEffect(() => {}, [stateTransactions, mult])
+    useEffect(() => {}, [transactions, mult])
 
     const removeFromState = (id) => {
-        setStateTransactions(prev => prev.filter((item, _) => item.id != id));
+        setTransactions(prev => prev.filter((item, _) => item.id != id));
     }
-    const callback = (data) => {
-        console.log(data)
-        setStateTransactions(prev => prev.map((item, _) => {
+    const callback = (data: any) => {
+        const t = transactions.map((item, _) => {
             if (item.id == data.id) {
                 item = data
             }
-        }))
+            return item
+        })
+        setTransactions(t)
     }
 
     return (
@@ -69,8 +71,9 @@ export const List = () => {
             <button
                 title="Delete Selected"
                 onClick={async(e) => {
-					// TODO: uncommit later
-                    //await db.deleteTransactions([transactionId])
+                    await db.deleteTransactions([transactionId])
+                    console.log(transactionId)
+                    console.log(transactions)
                     transactionId.forEach((id) => {
                         removeFromState(id)
                     })
@@ -81,7 +84,7 @@ export const List = () => {
 
 			<Utils/>
 
-            {stateTransactions.map((transaction, index) => {
+            {transactions.map((transaction, index) => {
                 return (
 					<div className="transaction-card" key={transaction.id}>
 						<div className="account">
@@ -121,8 +124,7 @@ export const List = () => {
 						{!mult ? <button
                             title="Delete"
                             onClick={async(e) => {
-								//TODO: uncommit later
-                                //await db.deleteTransactions([transaction.id])
+                                await db.deleteTransactions([transaction.id])
                                 removeFromState(transaction.id)
 						    }}
                         >

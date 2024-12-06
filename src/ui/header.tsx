@@ -1,8 +1,8 @@
-import { useContext } from 'react';
-import { ResourcesContext } from './view';
+import { useResourcesContext } from './resourcesProvider';
 
 export const Header = () => {
-    const { accounts, categories } = useContext(ResourcesContext)
+    const { accounts, categories } = useResourcesContext()
+
     return (
 		<div>
             <select>

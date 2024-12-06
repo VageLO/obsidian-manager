@@ -6,7 +6,7 @@ export class EditModal extends Modal {
 		app: App,
 		database: ManagerDatabase,
 		callback: (arg: any) => void,
-        onCloseCallback: (transaction) => void,
+        onCloseCallback: (transaction: any) => void,
 	) {
 		super(app);
         this.app = app;

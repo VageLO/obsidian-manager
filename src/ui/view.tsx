@@ -1,12 +1,12 @@
-import { StrictMode, createContext } from 'react';
+import { StrictMode } from 'react';
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { Root, createRoot } from 'react-dom/client';
 import { Header } from './header';
 import { List } from './list';
 import { ManagerDatabase } from '../database';
+import { ResourceProvider } from './resourcesProvider';
 
 export const VIEW_TYPE = 'manager-view';
-export const ResourcesContext = createContext(null);
 
 export class ManagerView extends ItemView {
 	root: Root | null = null;
@@ -26,18 +26,12 @@ export class ManagerView extends ItemView {
 
 	async onOpen() {
 		this.root = createRoot(this.containerEl.children[1]);
-        const resources = {
-            db: this.db,
-            transactions: await this.db.listTransactions(),
-            categories: await this.db.listCategories(),
-            accounts: await this.db.listAccounts(),
-        }
 		this.root.render(
 			<StrictMode>
-                <ResourcesContext.Provider value={resources}>
+                <ResourceProvider db={this.db}>
 				    <Header/>
                     <List/>
-                </ResourcesContext.Provider>
+                </ResourceProvider>
 			</StrictMode>,
 		);
 	}

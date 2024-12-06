@@ -1,17 +1,21 @@
-import { React , useState, useEffect, useContext } from 'react';
+import { React , useEffect } from 'react';
 import { 
     transactionModal,
     createAccount,
     createCategory,
     EditModal,
 } from './modals';
-import { ResourcesContext } from './view';
+import { useResourcesContext } from './resourcesProvider';
 
 
 export const Utils = () => {
 
-    const { transactions, db } = useContext(ResourcesContext)
+    const { setTransactions, transactions, db } = useResourcesContext()
 	const { app, plugin } = db
+
+    const addTransaction = (data: any) => {
+        setTransactions((prev) => [...prev, data])
+    }
 
     return (
 		<>
@@ -36,7 +40,7 @@ export const Utils = () => {
 			<button
                 title="add transaction"
                 onClick={(e) => {
-					const modal = new EditModal(app, plugin.database, transactionModal)
+					const modal = new EditModal(app, plugin.database, transactionModal, (data) => addTransaction(data))
 					modal.load()
 					modal.open()
 				}}>

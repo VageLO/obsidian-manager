@@ -198,8 +198,12 @@ export async function transactionModal(this: EditModal, selected_transaction) {
 			btn
 			.setButtonText('💾')
 			.setCta()
-			.onClick(() => {
-                this.transaction = transaction
+			.onClick(async() => {
+                // TODO: update transaction
+                //if (selected_transaction)
+                    // await this.database.updateTransaction(transaction)
+                //else
+                this.transaction = await this.database.insertTransaction(transaction)
 				this.close();
 			}));
 }
