@@ -6,6 +6,7 @@ export interface ManagerSettings {
 
 export const DEFAULT_SETTINGS: ManagerSettings = {
     databasePath: '',
+    apiProject: '',
 }
 
 export class ManagerSettingTab extends PluginSettingTab {
@@ -21,9 +22,10 @@ export class ManagerSettingTab extends PluginSettingTab {
         const { adapter } = app.vault
         
         containerEl.empty()
-        new Setting(containerEl)
+
+        const localdb = new Setting(containerEl)
             .setName('Database')
-            .setDesc('Database file path')
+            .setDesc('Local database file path')
             .addText((text) =>
               text
                 .setValue(plugin.settings.databasePath)
@@ -40,5 +42,39 @@ export class ManagerSettingTab extends PluginSettingTab {
                     await plugin.activateView();
                 })
             );
+
+        localdb.addToggle((toggle) => {
+		    toggle
+		    	.setValue(true)
+                .setTooltip(
+                    "Enable local database",
+                    {delay: 1, placement: 'left'})
+		    	.onChange((value) => {
+                })
+        })
+
+        const apidb = new Setting(containerEl)
+            .setName('API Database')
+            .setDesc('Database file name that will be used from API')
+            .addText((text) =>
+              text
+                .setValue(plugin.settings.apiProject)
+                .onChange(async (value) => {
+                    value = value.trim()
+                    if (value == '')
+                        return
+                    plugin.settings.apiProject = value;
+                })
+            );
+
+        apidb.addToggle((toggle) => {
+		    toggle
+		    	.setValue(true)
+                .setTooltip(
+                    "Enable database from api",
+                    {delay: 1, placement: 'left'})
+		    	.onChange((value) => {
+                })
+        })
     }
 }

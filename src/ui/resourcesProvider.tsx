@@ -8,7 +8,7 @@ export const ResourceProvider = ({children, db}) => {
     const [accounts, setAccounts] = useState([])
     const [categories, setCategories] = useState([])
     //const [loading, setLoading] = useState(true)
-
+    
     const setResources = useCallback(async() => {
         setTransactions(await db.listTransactions())
         setAccounts(await db.listAccounts())
