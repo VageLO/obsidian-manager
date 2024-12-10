@@ -44,9 +44,7 @@ export const List = () => {
 
     const [mult, setMult] = useState(false)
 
-    useEffect(() => {
-		console.log('use', transactions)
-	}, [transactions, mult])
+    useEffect(() => {}, [transactions, mult])
 
     const removeFromState = (id) => {
         setTransactions(prev => prev.filter((item, _) => item.id != id));
@@ -74,9 +72,7 @@ export const List = () => {
             <button
                 title="Delete Selected"
                 onClick={async(e) => {
-                    await db.deleteTransactions([transactionId])
-                    console.log(transactionId)
-                    console.log(transactions)
+                    await db.deleteTransactions(transactionId)
                     transactionId.forEach((id) => {
                         removeFromState(id)
                     })
