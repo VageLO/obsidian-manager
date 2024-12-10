@@ -25,7 +25,7 @@ export class ManagerDatabase {
         }
 
         try {
-            const db = await this.app.vault.adapter.readBinary(this.pluginFile(file))
+            const db = await this.app.vault.adapter.readBinary(this.plugin.settings.databasePath)
             this.db = new SQL.Database(Buffer.from(db))
         } catch (e) {
             const error = new Error(e)

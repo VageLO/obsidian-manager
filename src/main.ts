@@ -2,6 +2,7 @@ import { DEFAULT_SETTINGS, ManagerSettings, ManagerSettingTab} from './settings'
 import { ManagerView, VIEW_TYPE } from './ui/view';
 import { Plugin, WorkspaceLeaf, addIcon, Notice } from 'obsidian'
 import { ManagerDatabase } from './database'
+import { ManagerAPIDatabase } from './api'
 import { BindParams } from 'sql.js'
 
 export default class ManagerPlugin extends Plugin {
@@ -13,9 +14,11 @@ export default class ManagerPlugin extends Plugin {
         await this.loadSettings()
         this.addSettingTab(new ManagerSettingTab(this.app, this));
 
-        const err = await this.loadDatabase()
+
+        const err = await this.detectDatabaseType()
         if (err instanceof Error)
             new Notice(`Error: ${err.message}`)
+		else this.notify()
 
         this.registerView(
             VIEW_TYPE,
@@ -26,21 +29,41 @@ export default class ManagerPlugin extends Plugin {
         addIcon('dollar', ribbon);
         this.addRibbonIcon('dollar', 'Money Manager', async() => {
 
-            const err = await this.loadDatabase()
-            if (err instanceof Error) {
-                new Notice(`Error: ${err.message}`)
-                return
-            }
+            const err = await this.detectDatabaseType()
+            if (err instanceof Error)
+                return new Notice(`Error: ${err.message}`)
 
-            this.activateView();
+            await this.activateView();
         });
     }
     
-    async loadDatabase() {
+	async notify() {
+		const { api, local, databasePath, apiProject } = this.settings
+		if (api)
+			new Notice(`API ${apiProject} file loaded`)
+		else if (local)
+			new Notice(`Local ${databasePath} file loaded`)
+	}
+
+	async detectDatabaseType() {
+		const { api, local } = this.settings
+
+		if (local) {
+			return await this.loadLocalDatabase()
+		}
+		else if (api) {
+			this.database = new ManagerAPIDatabase(this)
+			return await this.database.checkAPI()
+		}
+		else 
+			return new Error("Specify database in settings")
+	}
+
+    async loadLocalDatabase() {
         this.database = new ManagerDatabase(this)
         return await this.database.initDatabase()
     }
- 
+
     async loadSettings () {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
     }

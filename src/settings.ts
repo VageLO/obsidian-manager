@@ -5,6 +5,8 @@ export interface ManagerSettings {
 }
 
 export const DEFAULT_SETTINGS: ManagerSettings = {
+	local: false,
+	api: false,
     databasePath: '',
     apiProject: '',
 }
@@ -28,28 +30,55 @@ export class ManagerSettingTab extends PluginSettingTab {
             .setDesc('Local database file path')
             .addText((text) =>
               text
-                .setValue(plugin.settings.databasePath)
-                .onChange(async (value) => {
-                    value = value.trim()
-                    const path = adapter.path.join(adapter.basePath, plugin.database.pluginFile(value))
-                    if (!adapter.fs.existsSync(path) || value == '')
-                        return
+				.setValue(plugin.settings.databasePath)
+				.onChange(async (value) => {
+					value = value.trim()
 
-                    new Notice(`${value} loaded`)
-                    plugin.settings.databasePath = value;
-                    await plugin.saveSettings();
-                    await plugin.loadDatabase();
-                    await plugin.activateView();
-                })
+					const localdb_toggle = localdb.components[1]
+					localdb_toggle.setValue(false)
+
+					plugin.settings.databasePath = value;
+					await plugin.saveSettings();
+				})
             );
 
         localdb.addToggle((toggle) => {
 		    toggle
-		    	.setValue(true)
+		    	.setValue(plugin.settings.local)
                 .setTooltip(
                     "Enable local database",
                     {delay: 1, placement: 'left'})
-		    	.onChange((value) => {
+				.setDisabled(plugin.settings.api)
+		    	.onChange(async(value) => {
+					const apidb_toggle = apidb.components[1]
+					if (apidb_toggle.on)
+						return
+
+					const path = adapter.path.join(adapter.basePath, plugin.settings.databasePath)
+					if (!adapter.fs.existsSync(path) && value) {
+						new Notice(`${path} doesn't exist`)
+						const localdb_toggle = localdb.components[1]
+						localdb_toggle.setValue(false)
+						return
+					} else if (!adapter.fs.existsSync(path) && !value)
+						return
+
+					if (!value)
+						apidb_toggle.setDisabled(value)
+					else
+						apidb_toggle.setDisabled(value)
+
+					plugin.settings.api = false
+					plugin.settings.local = value
+
+					await plugin.saveSettings()
+					const err = await plugin.detectDatabaseType()
+					if (err instanceof Error)
+						new Notice(`Error: ${err.message}`)
+					else {
+						plugin.notify()
+						await plugin.activateView();
+					}
                 })
         })
 
@@ -57,23 +86,60 @@ export class ManagerSettingTab extends PluginSettingTab {
             .setName('API Database')
             .setDesc('Database file name that will be used from API')
             .addText((text) =>
-              text
-                .setValue(plugin.settings.apiProject)
-                .onChange(async (value) => {
-                    value = value.trim()
-                    if (value == '')
-                        return
-                    plugin.settings.apiProject = value;
-                })
+				text
+				.setValue(plugin.settings.apiProject)
+				.onChange(async (value) => {
+					value = value.trim()
+					if (value == '')
+						return
+
+					const apidb_toggle = apidb.components[1]
+					apidb_toggle.setValue(false)
+
+					plugin.settings.apiProject = value;
+					await plugin.saveSettings()
+				})
             );
 
         apidb.addToggle((toggle) => {
 		    toggle
-		    	.setValue(true)
+		    	.setValue(plugin.settings.api)
                 .setTooltip(
                     "Enable database from api",
                     {delay: 1, placement: 'left'})
-		    	.onChange((value) => {
+				.setDisabled(plugin.settings.local)
+		    	.onChange(async(value) => {
+					const localdb_toggle = localdb.components[1]
+					const { apiProject } = plugin.settings
+
+					if (localdb_toggle.on)
+						return
+
+					const isNotDbFile = adapter.path.extname(apiProject) != '.db'
+					if (isNotDbFile && value) {
+						new Notice(`${apiProject} isn't database file`)
+						const apidb_toggle = localdb.components[1]
+						apidb_toggle.setValue(false)
+						return
+					} else if (isNotDbFile && !value)
+						return
+
+					if (!value)
+						localdb_toggle.setDisabled(value)
+					else
+						localdb_toggle.setDisabled(value)
+
+					plugin.settings.local = false;
+					plugin.settings.api = value;
+
+					await plugin.saveSettings();
+					const err = await plugin.detectDatabaseType()
+					if (err instanceof Error)
+						new Notice(`Error: ${err.message}`)
+					else {
+						plugin.notify()
+						await plugin.activateView();
+					}
                 })
         })
     }

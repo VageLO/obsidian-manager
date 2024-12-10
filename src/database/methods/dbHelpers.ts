@@ -24,7 +24,15 @@ export function createObjFromArray(obj: {columns: any[], values: any[]}) : any[]
 
 	values.forEach((value) => {
 		const obj = columns.reduce((acc, column, index) => {
-			acc[column] = value[index];
+			const keyParts = column.split('.')
+			if (keyParts[1]) {
+				acc[keyParts[0]] = acc[keyParts[0]] || {}
+				acc[keyParts[0]][keyParts[1]] = value[index]
+				if (Object.values(acc[keyParts[0]]).every(value => value == null))
+					acc[keyParts[0]] = null
+			} else {
+				acc[column] = value[index];
+			}
 			return acc;
 		}, {});
 		transactions.push(obj)

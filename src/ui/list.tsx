@@ -44,11 +44,14 @@ export const List = () => {
 
     const [mult, setMult] = useState(false)
 
-    useEffect(() => {}, [transactions, mult])
+    useEffect(() => {
+		console.log('use', transactions)
+	}, [transactions, mult])
 
     const removeFromState = (id) => {
         setTransactions(prev => prev.filter((item, _) => item.id != id));
     }
+
     const callback = (data: any) => {
         const t = transactions.map((item, _) => {
             if (item.id == data.id) {
@@ -84,38 +87,38 @@ export const List = () => {
 
 			<Utils/>
 
-            {transactions.map((transaction, index) => {
+            {transactions.map((t, index) => {
                 return (
-					<div className="transaction-card" key={transaction.id}>
+					<div className="transaction-card" key={t.transaction.id}>
 						<div className="account">
-                            <p style={colorAccount(transaction)}>
-                                {transaction.from_account}
+                            <p style={colorAccount(t.transaction)}>
+                                {t.from_account.title}
                             </p>
-                            <p>{transaction.to_account ? " > " : ""}</p>
-                            <p style={colorAccount(transaction, transaction.to_account_id)}>
-                                {transaction.to_account ? transaction.to_account : ""}
-                            </p>
-                        </div>
-                    	<div className="amount">
-                            <p style={colorAmount(transaction)}>
-                                {transaction.amount + " " + transaction.from_account_currency}
-                            </p>
-                            <p>{transaction.to_amount > 0 ? " > " : ""}</p>
-                            <p style={colorAmount(transaction, transaction.to_account_id)}>
-                                {transaction.to_amount > 0 ? transaction.to_amount + 
-                                    " " + transaction.to_account_currency : ""}
+                            <p>{t.to_account ? " > " : ""}</p>
+                            <p style={colorAccount(t.transaction, t.transaction.to_account_id)}>
+                                {t.to_account ? t.to_account.title : ""}
                             </p>
                         </div>
-                    	<p className="date">{transaction.date}</p>
-                    	<p className="operation-type">{transaction.transaction_type}</p>
-                    	<p className="desc">{transaction.description}</p>
+						<div className="amount">
+						    <p style={colorAmount(t.transaction)}>
+						        {t.transaction.amount + " " + t.from_account.currency}
+						    </p>
+						    <p>{t.transaction.to_amount > 0 ? " > " : ""}</p>
+						    <p style={colorAmount(t.transaction, t.transaction.to_account_id)}>
+						        {t.transaction.to_amount > 0 ? t.transaction.to_amount + 
+						            " " + t.to_account.currency : ""}
+						    </p>
+						</div>
+						<p className="date">{t.transaction.date}</p>
+						<p className="operation-type">{t.transaction.transaction_type}</p>
+						<p className="desc">{t.transaction.description}</p>
 
 						{!mult ? <button
                             title="Edit"
                             onClick={(e) => {
 							    const modal = new EditModal(app, plugin.database, transactionModal, 
                                     (data) => callback(data))
-								modal.load(transaction)
+								modal.load(t.transaction)
 								modal.open()
 						    }}
                         >
@@ -124,8 +127,8 @@ export const List = () => {
 						{!mult ? <button
                             title="Delete"
                             onClick={async(e) => {
-                                await db.deleteTransactions([transaction.id])
-                                removeFromState(transaction.id)
+                                await db.deleteTransactions([t.transaction.id])
+                                removeFromState(t.transaction.id)
 						    }}
                         >
 						    🚽
@@ -135,7 +138,7 @@ export const List = () => {
                         <input
                             type="checkbox"
                             name="cb_transaction" 
-                            id={transaction.id}
+                            id={t.transaction.id}
                             onChange={(e) => {
                                 const id = +e.target.id
 
