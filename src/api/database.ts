@@ -1,10 +1,12 @@
 import ManagerPlugin from '../main'
-import { App } from 'obsidian'
+import { App, RequestUrlParam, requestUrl } from 'obsidian'
 import * as requests from './requests'
 
 export class ManagerAPIDatabase {
 	plugin: ManagerPlugin
 	app: App
+	apiURL: string
+	project: string
 
 	constructor (plugin: ManagerPlugin) {
 		this.plugin = plugin
@@ -20,7 +22,7 @@ export class ManagerAPIDatabase {
 			method: "GET",
 		}
 		try {
-			const res = await requestUrl(request)
+			await requestUrl(request)
 		}
 		catch(e) {
 			return new Error(`${this.apiURL} ${e.message}`)

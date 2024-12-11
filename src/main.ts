@@ -86,7 +86,7 @@ export default class ManagerPlugin extends Plugin {
             leaf = leaves[0];
             leaf.rebuildView();
         } else {
-            leaf = workspace.getRightLeaf(false);
+            leaf = workspace.getLeaf(false);
             await leaf.setViewState({ type: VIEW_TYPE, active: true });
         }
 

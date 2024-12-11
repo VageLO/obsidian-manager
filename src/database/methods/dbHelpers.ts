@@ -1,9 +1,8 @@
-import { QueryExecResult } from 'sql.js'
 import { ManagerDatabase } from '..'
 
 export async function save (this: ManagerDatabase) {
     const data = this.db.export().buffer
-    await this.app.vault.adapter.writeBinary(this.pluginFile(this.plugin.settings.databasePath), data)
+    await this.app.vault.adapter.writeBinary(this.plugin.settings.databasePath, data)
 }
 
 export function pluginFile (this: ManagerDatabase, filename: string, absolute = false) {
@@ -20,7 +19,7 @@ export function pluginFile (this: ManagerDatabase, filename: string, absolute = 
 
 export function createObjFromArray(obj: {columns: any[], values: any[]}) : any[] {
 	const { columns, values } = obj
-	const transactions = []
+	const transactions: any[]  = []
 
 	values.forEach((value) => {
 		const obj = columns.reduce((acc, column, index) => {

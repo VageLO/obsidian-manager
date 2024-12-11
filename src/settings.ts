@@ -2,6 +2,10 @@ import { App, Notice, PluginSettingTab, Setting } from 'obsidian'
 import ManagerPlugin from './main'
 
 export interface ManagerSettings {
+	local: boolean,
+	api: boolean,
+	databasePath: string,
+	apiProject: string,
 }
 
 export const DEFAULT_SETTINGS: ManagerSettings = {
@@ -12,6 +16,7 @@ export const DEFAULT_SETTINGS: ManagerSettings = {
 }
 
 export class ManagerSettingTab extends PluginSettingTab {
+	app: App
     plugin: ManagerPlugin
     
     constructor (app: App, plugin: ManagerPlugin) {

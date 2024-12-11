@@ -1,3 +1,5 @@
+// TODO: refine
+
 export const allTransactions = `
 SELECT 
 Transactions.id as 'transaction.id',
@@ -69,9 +71,23 @@ NULL as 'to_account.balance',
 category.id as 'category.id',
 category.parent_id as 'category.parent_id',
 category.title as 'category.title'
+
+FROM Transactions
+INNER JOIN Categories as category ON category.id = Transactions.category_id
+INNER JOIN Accounts as from_account ON from_account.id = Transactions.account_id 
+WHERE Transactions.to_account_id IS NULL AND Transactions.id = ?
+
+UNION ALL
+
+SELECT
+Transactions.*,
+from_account.*,
+to_account.*,
+category.*
 FROM Transactions 
-INNER JOIN Categories ON Categories.id = Transactions.category_id
+INNER JOIN Categories as category ON category.id = Transactions.category_id
 INNER JOIN Accounts as from_account ON from_account.id = Transactions.account_id
 INNER JOIN Accounts as to_account ON to_account.id = Transactions.to_account_id
-WHERE Transactions.id = ?
+WHERE Transactions.to_account_id IS NOT NULL AND Transactions.id = ?
+ORDER BY Transactions.date DESC;
 `

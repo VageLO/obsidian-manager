@@ -1,8 +1,6 @@
 import { 
-    React,
     useState,
     useEffect,
-    useContext,
 } from 'react';
 import { 
     transactionModal,
@@ -14,7 +12,7 @@ import { Utils } from './utils';
 const success_color = "var(--text-success)"
 const error_color = "var(--text-error)"
 
-const colorAccount = (transaction, to_account_id) => {
+const colorAccount = (transaction, to_account_id: number) => {
     if(transaction.transaction_type == 'Deposit')
         return { color: success_color }
     if(to_account_id)
@@ -22,7 +20,7 @@ const colorAccount = (transaction, to_account_id) => {
     return { color: error_color }
 }
 
-const colorAmount = (transaction, to_account_id) => {
+const colorAmount = (transaction, to_account_id: number) => {
     if(transaction.transaction_type == 'Deposit')
         return { color: success_color }
     if(to_account_id)
@@ -47,12 +45,12 @@ export const List = () => {
     useEffect(() => {}, [transactions, mult])
 
     const removeFromState = (id) => {
-        setTransactions(prev => prev.filter((item, _) => item.id != id));
+        setTransactions(prev => prev.filter((item, _) => item.transaction.id != id));
     }
 
     const callback = (data: any) => {
         const t = transactions.map((item, _) => {
-            if (item.id == data.id) {
+            if (item.transaction.id == data.transaction.id) {
                 item = data
             }
             return item
@@ -83,7 +81,7 @@ export const List = () => {
 
 			<Utils/>
 
-            {transactions.map((t, index) => {
+            {transactions.map((t, _) => {
                 return (
 					<div className="transaction-card" key={t.transaction.id}>
 						<div className="account">
@@ -111,7 +109,7 @@ export const List = () => {
 
 						{!mult ? <button
                             title="Edit"
-                            onClick={(e) => {
+                            onClick={() => {
 							    const modal = new EditModal(app, plugin.database, transactionModal, 
                                     (data) => callback(data))
 								modal.load(t.transaction)
@@ -122,7 +120,7 @@ export const List = () => {
 						</button> : ""}
 						{!mult ? <button
                             title="Delete"
-                            onClick={async(e) => {
+                            onClick={async() => {
                                 await db.deleteTransactions([t.transaction.id])
                                 removeFromState(t.transaction.id)
 						    }}
@@ -144,7 +142,7 @@ export const List = () => {
                                     transactionId.push(id)
                                     setTransactionId(transactionId)
                                 }
-                                else if(tId != -1 || tIndex != -1) {
+                                else if(tId != -1) {
                                     transactionId.splice(tId, 1)
                                     setTransactionId(transactionId)
                                 }

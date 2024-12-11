@@ -1,14 +1,16 @@
-import { Setting, Notice } from 'obsidian';
+import { Setting, Notice, BaseComponent } from 'obsidian';
 import { EditModal } from './modal';
 
-export async function transactionModal(this: EditModal, selected_transaction) {
+// TODO: field validation
+
+export async function transactionModal(this: EditModal, selected_transaction: any) {
 	const accounts = await this.database.listAccounts();
 	const categories = await this.database.listCategories();
 
 	interface Transaction {
-		account_id: number;
-		category_id: number;
-		to_account_id: number;
+		account_id: number | null;
+		category_id: number | null;
+		to_account_id: number | null;
 		amount: number;
 		to_amount: number;
 		transaction_type: string;
@@ -21,7 +23,7 @@ export async function transactionModal(this: EditModal, selected_transaction) {
 		category_id: null,
 		to_account_id: null,
 		amount: 0,
-		to_amount: null,
+		to_amount: 0,
 		transaction_type: "Withdrawal",
 		date: new Date().toISOString().split("T")[0],
 		description: "",
@@ -47,8 +49,7 @@ export async function transactionModal(this: EditModal, selected_transaction) {
 	    	text
 	    		.setValue(transaction.amount.toString())
 	    		.onChange((value) => {
-	    			value = +value;
-	    			transaction.amount = value; 
+	    			transaction.amount = +value; 
 	    		})
 	    })
 
@@ -59,8 +60,7 @@ export async function transactionModal(this: EditModal, selected_transaction) {
             .setPlaceholder("Converted Amount")
 			.setValue(transaction.to_amount ? transaction.to_amount.toString() : "")
 			.onChange((value) => {
-				value = +value;
-				transaction.to_amount = value; 
+				transaction.to_amount = +value; 
 			})
 		text.inputEl.dataset.key = "to_amount"
 	})
@@ -84,13 +84,13 @@ export async function transactionModal(this: EditModal, selected_transaction) {
 
 	const from_account = new Setting(this.contentEl)
 		.addDropdown((d) => {
-			accounts.forEach((account) => {
+			accounts.forEach((account: any) => {
 				d.addOption(account.id, account.title)
 			})
 			d
 				.setValue(transaction.account_id)
-				.onChange((value) => {
-					value = +value
+				.onChange((v) => {
+					const value = +v
 					if (value == transaction.to_account_id)
 						new Notice('Accounts should be different')
 					transaction.account_id = value;
@@ -101,12 +101,17 @@ export async function transactionModal(this: EditModal, selected_transaction) {
     const to_account = new Setting(this.contentEl)
         .addDropdown((d) => {
             d.setDisabled(true)
-        	accounts.forEach((account) => {
+        	accounts.forEach((account: any) => {
         		d.addOption(account.id, account.title)
+				if (account.id == transaction.to_account_id) {
+					d
+						.setValue(account.id)
+						.setDisabled(false)
+				}
         	})
         	d
-        		.onChange((value) => {
-        			value = +value
+        		.onChange((v) => {
+        			const value = +v
         			if (value == transaction.account_id)
         				new Notice('Accounts should be different')
         			transaction.to_account_id = value;
@@ -118,20 +123,18 @@ export async function transactionModal(this: EditModal, selected_transaction) {
     to_account.addToggle((toggle) => {
 		toggle
 			.setValue(true)
-            .setTooltip(
-                tooltip="Enable transfer to account",
-                options={delay: 1, placement: 'left'})
+            .setTooltip("Enable transfer to account", {delay: 1, placement: 'left'})
 			.onChange((value) => {
-				let to_amountField : Setting
-				let to_accountDropdown: Setting
+				let to_amountField : BaseComponent
+				let to_accountDropdown: BaseComponent
 
-				amount.components.forEach((component) => {
+				amount.components.forEach((component: BaseComponent) => {
 					if (!component.inputEl)
-						return 
+						return
 					else if (component.inputEl.dataset.key == "to_amount")
 						to_amountField = component
 				})
-                to_account.components.forEach((component) => {
+                to_account.components.forEach((component: BaseComponent) => {
 					if (!component.selectEl)
 						return 
 					else if (component.selectEl.dataset.key == "to_account")
@@ -142,11 +145,11 @@ export async function transactionModal(this: EditModal, selected_transaction) {
 				    to_amountField.setDisabled(false)
 				    to_accountDropdown.setDisabled(false)
 
-                    // Set transaction type to Transfer and disable dropdown
-				    const typeDropdown = type.components[0]
+                    // Set transaction to type 'Transfer' and disable dropdown
+					const typeDropdown = type.components[0]
+				    typeDropdown.setDisabled(true)
                     typeDropdown.setValue("Transfer")
                     transaction.transaction_type = typeDropdown.getValue() 
-				    typeDropdown.setDisabled(true)
 
                     transaction.to_account_id = +to_accountDropdown.getValue()
                 } else {
@@ -157,8 +160,11 @@ export async function transactionModal(this: EditModal, selected_transaction) {
 				    to_amountField.setDisabled(true)
 				    to_amountField.setValue("")
 
+                    // Set transaction type 'Withdrawal' and enable dropdown
 				    const typeDropdown = type.components[0]
 				    typeDropdown.setDisabled(false)
+                    typeDropdown.setValue("Withdrawal")
+                    transaction.transaction_type = typeDropdown.getValue() 
                 }
 			})
 
@@ -171,14 +177,13 @@ export async function transactionModal(this: EditModal, selected_transaction) {
 
 	new Setting(this.contentEl)
 		.addDropdown((d) => {
-			categories.forEach((category) => {
+			categories.forEach((category: any) => {
 				d.addOption(category.id, category.title)
 			})
 			d
 				.setValue(transaction.category_id)
 				.onChange((value) => {
-					value = +value
-					transaction.category_id = value;
+					transaction.category_id = +value;
 				})
 		})
 		.setName("Category")
@@ -199,11 +204,11 @@ export async function transactionModal(this: EditModal, selected_transaction) {
 			.setButtonText('💾')
 			.setCta()
 			.onClick(async() => {
-                // TODO: update transaction
-                //if (selected_transaction)
-                    // await this.database.updateTransaction(transaction)
-                //else
-                this.transaction = await this.database.insertTransaction(transaction)
+                if (selected_transaction)
+                    this.transaction = await this.database.updateTransaction(transaction)
+                else
+					this.transaction = await this.database.insertTransaction(transaction)
+
 				this.close();
 			}));
 }

@@ -1,6 +1,4 @@
 import { createContext, useEffect, useContext, useState, useCallback } from 'react';
-import { ManagerDatabase } from '../database';
-import { ManagerAPIDatabase } from '../api';
 
 export const ResourcesContext = createContext();
 
@@ -9,12 +7,14 @@ export const ResourceProvider = ({children, db}) => {
     const [transactions, setTransactions] = useState([])
     const [accounts, setAccounts] = useState([])
     const [categories, setCategories] = useState([])
-    //const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true)
     
 	const setResources = useCallback(async() => {
+		setLoading(true)
 		setTransactions(await db.listTransactions())
 		setAccounts(await db.listAccounts())
 		setCategories(await db.listCategories())
+		setLoading(false)
 	}, [])
 
     useEffect(() => {
@@ -31,6 +31,11 @@ export const ResourceProvider = ({children, db}) => {
         setAccounts: setAccounts,
     }
 
+	if (loading) {
+		return (
+			<div>Loading</div>
+		)
+	}
     return (
         <ResourcesContext.Provider value={resources}>
             {children}

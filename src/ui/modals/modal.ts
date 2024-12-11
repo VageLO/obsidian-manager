@@ -1,10 +1,17 @@
-import { App, Modal, Setting, Notice } from 'obsidian';
-import { ManagerDatabase } from '../database';
+import { App, Modal } from 'obsidian';
+import { ManagerDatabase } from '../../database';
+import { ManagerAPIDatabase } from '../../api';
 
 export class EditModal extends Modal {
+	app: App
+	database: ManagerDatabase | ManagerAPIDatabase
+	callback: (arg: any) => void
+	onCloseCallback: (transaction: any) => void
+	transaction: any
+
 	constructor(
 		app: App,
-		database: ManagerDatabase,
+		database: ManagerDatabase | ManagerAPIDatabase,
 		callback: (arg: any) => void,
         onCloseCallback: (transaction: any) => void,
 	) {
@@ -16,12 +23,13 @@ export class EditModal extends Modal {
 	}
 
 	async load(arg: any) {
-		await this.callback(arg)
+		this.callback(arg)
 	}
 
     onClose() {
         const { contentEl, transaction } = this
-        this.onCloseCallback(transaction)
+		if (transaction)
+			this.onCloseCallback(transaction)
         contentEl.empty()
     }
 }
