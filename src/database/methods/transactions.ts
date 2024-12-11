@@ -1,13 +1,23 @@
 import { ManagerDatabase } from '..';
+import { QueryExecResult } from 'sql.js';
 import { 
 	allTransactions,
 	getTransactionById,
 } from './queries'
 import { createObjFromArray } from './dbHelpers';
 
-export async function listTransactions(this: ManagerDatabase) {
-    const res = this.db.exec(allTransactions)
-	
+export async function listTransactions(this: ManagerDatabase, account_id?: number, category_id?: number) {
+	let res : QueryExecResult[] = []
+
+	if (account_id && category_id)
+		res = this.db.exec(allTransactions(`AND Transactions.account_id=${account_id} AND Transactions.category_id=${category_id}`))
+	else if (account_id)
+		res = this.db.exec(allTransactions(`AND Transactions.account_id=${account_id}`))
+	else if (category_id)
+		res = this.db.exec(allTransactions(`AND Transactions.account_id=${category_id}`))
+	else
+		res = this.db.exec(allTransactions(''))
+
     if (!res.length)
         return []
 	const transactions = createObjFromArray(res[0])

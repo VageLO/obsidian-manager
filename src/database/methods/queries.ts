@@ -1,6 +1,7 @@
 // TODO: refine
 
-export const allTransactions = `
+export const allTransactions = (substring: string) : string => {
+return `
 SELECT 
 Transactions.id as 'transaction.id',
 Transactions.account_id as 'transaction.account_id',
@@ -29,7 +30,7 @@ category.title as 'category.title'
 FROM Transactions
 INNER JOIN Categories as category ON category.id = Transactions.category_id
 INNER JOIN Accounts as from_account ON from_account.id = Transactions.account_id 
-WHERE Transactions.to_account_id IS NULL
+WHERE Transactions.to_account_id IS NULL ${substring}
 
 UNION ALL
 
@@ -42,9 +43,10 @@ FROM Transactions
 INNER JOIN Categories as category ON category.id = Transactions.category_id
 INNER JOIN Accounts as from_account ON from_account.id = Transactions.account_id
 INNER JOIN Accounts as to_account ON to_account.id = Transactions.to_account_id
-WHERE Transactions.to_account_id IS NOT NULL
+WHERE Transactions.to_account_id IS NOT NULL ${substring}
 ORDER BY Transactions.date DESC;
 `
+}
 
 export const getTransactionById = `
 SELECT 

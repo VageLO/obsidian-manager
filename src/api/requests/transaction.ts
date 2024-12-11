@@ -10,11 +10,9 @@ export async function listTransactions(this: ManagerAPIDatabase, account_id?: nu
 		url +=`?account_id=${account_id}&category_id=${category_id}`
 	else if (account_id)
 		url +=`?account_id=${account_id}`
-	else if (account_id)
-		url +=`?category_id=${account_id}`
+	else if (category_id)
+		url +=`?category_id=${category_id}`
 	
-	console.log(url)
-
 	const request: RequestUrlParam = {
 	    url: url,
 	    method: "GET",
