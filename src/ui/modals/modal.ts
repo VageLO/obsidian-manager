@@ -7,7 +7,7 @@ export class EditModal extends Modal {
 	database: ManagerDatabase | ManagerAPIDatabase
 	callback: (arg: any) => void
 	onCloseCallback: (transaction: any) => void
-	transaction: any
+	data: any
 
 	constructor(
 		app: App,
@@ -27,9 +27,9 @@ export class EditModal extends Modal {
 	}
 
     onClose() {
-        const { contentEl, transaction } = this
-		if (transaction)
-			this.onCloseCallback(transaction)
+        const { contentEl, data } = this
+		if (data)
+			this.onCloseCallback(data)
         contentEl.empty()
     }
 }

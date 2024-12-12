@@ -14,7 +14,7 @@ export async function listTransactions(this: ManagerDatabase, account_id?: numbe
 	else if (account_id)
 		res = this.db.exec(allTransactions(`AND Transactions.account_id=${account_id}`))
 	else if (category_id)
-		res = this.db.exec(allTransactions(`AND Transactions.account_id=${category_id}`))
+		res = this.db.exec(allTransactions(`AND Transactions.category_id=${category_id}`))
 	else
 		res = this.db.exec(allTransactions(''))
 

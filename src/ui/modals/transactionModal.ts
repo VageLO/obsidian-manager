@@ -205,9 +205,9 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 			.setCta()
 			.onClick(async() => {
                 if (selected_transaction)
-                    this.transaction = await this.database.updateTransaction(transaction)
+                    this.data = await this.database.updateTransaction(transaction)
                 else
-					this.transaction = await this.database.insertTransaction(transaction)
+					this.data = await this.database.insertTransaction(transaction)
 
 				this.close();
 			}));

@@ -14,7 +14,7 @@ export const Header = () => {
 		if (byAccount || byCategory) {
 			fetchData()
 		}
-	}, [byAccount, byCategory])
+	}, [byAccount, byCategory, accounts, categories])
 
     return (
 		<div>

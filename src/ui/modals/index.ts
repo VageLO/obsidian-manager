@@ -1,4 +1,4 @@
 export * from './transactionModal'
-export * from './accountCreateModal'
-export * from './categoryCreateModal'
+export * from './accountModal'
+export * from './categoryModal'
 export * from './modal'
