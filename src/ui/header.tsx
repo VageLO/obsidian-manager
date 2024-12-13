@@ -4,16 +4,18 @@ import { useState, useEffect } from 'react'
 export const Header = () => {
     const { accounts, categories, setTransactions, db } = useResourcesContext()
 
-	const [byAccount, setByAccount] = useState(0)
-	const [byCategory, setByCategory] = useState(0)
+	const [byAccount, setByAccount] = useState(null)
+	const [byCategory, setByCategory] = useState(null)
 
 	useEffect(() => {
-		const fetchData = async() => {
-			setTransactions(await db.listTransactions(byAccount, byCategory))
+		const fetchData = async(account: any, category: any) => {
+			setTransactions(await db.listTransactions(account, category))
 		}
-		if (byAccount || byCategory) {
-			fetchData()
-		}
+		if (byAccount || byCategory)
+			fetchData(byAccount, byCategory)
+		else if (byAccount == 0 || byCategory == 0)
+			fetchData(byAccount, byCategory)
+
 	}, [byAccount, byCategory, accounts, categories])
 
     return (
@@ -24,7 +26,7 @@ export const Header = () => {
 					setByAccount(+id)
 				}}
 			>
-                <option defaultValue="" disable="true" hidden>Accounts</option>
+                <option id={'0'}>All Accounts</option>
 		        {accounts.map((account: any) => (
                     <option 
 						key={account.id}
@@ -40,7 +42,7 @@ export const Header = () => {
 					setByCategory(+id)
 				}}
 			>
-                <option defaultValue="" disable="true" hidden>Categories</option>
+                <option id={'0'}>All Categories</option>
 		        {categories.map((category: any) => (
                     <option 
 						key={category.id}
