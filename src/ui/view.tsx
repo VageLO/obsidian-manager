@@ -1,8 +1,7 @@
 import { StrictMode } from 'react';
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { Root, createRoot } from 'react-dom/client';
-import { Header } from './header';
-import { List } from './list';
+import { Tabs } from './tabs';
 import { ResourceProvider } from './resourcesProvider';
 
 export const VIEW_TYPE = 'manager-view';
@@ -28,8 +27,7 @@ export class ManagerView extends ItemView {
 		this.root.render(
 			<StrictMode>
                 <ResourceProvider db={this.db}>
-				    <Header/>
-                    <List/>
+					<Tabs/>
                 </ResourceProvider>
 			</StrictMode>,
 		);
