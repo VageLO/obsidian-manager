@@ -6,6 +6,12 @@ import {
 	EditModal,
 } from './modals';
 import { useResourcesContext } from './resourcesProvider';
+import { 
+	AccountIcon,
+	CategoryIcon,
+	TransactionIcon,
+	TagIcon,
+} from '../icons';
 
 
 export const Utils = () => {
@@ -37,43 +43,43 @@ export const Utils = () => {
 		else state((prev: any) => [...prev, data])
 	}
 	return (
-		<>
+		<div style={{display: 'inline'}}>
 			<button
-				title="add account"
+				title="Add account"
 				onClick={() => {
 					const modal = new EditModal(app, plugin.database, accountModal, (data) => setState(setAccounts, data))
 					modal.load()
 					modal.open()
 				}}>
-				+ A
+				<AccountIcon/>	
 			</button>
 			<button
-				title="add category"
+				title="Add category"
 				onClick={() => {
 					const modal = new EditModal(app, plugin.database, categoryModal, (data) => setState(setCategories, data))
 					modal.load()
 					modal.open()
 				}}>
-				+ C	
+				<CategoryIcon/>
 			</button>
 			<button
-				title="add transaction"
+				title="Add transaction"
 				onClick={() => {
 					const modal = new EditModal(app, plugin.database, transactionModal, (data) => addTransaction(data))
 					modal.load()
 					modal.open()
 				}}>
-				+ T
+				<TransactionIcon/>	
 			</button>
 			<button
-				title="add tag"
+				title="Add tag"
 				onClick={() => {
 					const modal = new EditModal(app, plugin.database, tagModal, (data) => setState(setTags, data))
 					modal.load()
 					modal.open()
 				}}>
-				+ TAG
+				<TagIcon/>
 			</button>
-		</>
+		</div>
 	);
 }

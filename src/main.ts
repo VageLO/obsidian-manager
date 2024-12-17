@@ -1,5 +1,5 @@
 import { DEFAULT_SETTINGS, ManagerSettings, ManagerSettingTab} from './settings'
-import { ribbon } from './icons.ts'
+import { ribbon, saveIcon } from './icons'
 import { ManagerView, VIEW_TYPE } from './ui/view';
 import { Plugin, WorkspaceLeaf, addIcon, Notice } from 'obsidian'
 import { ManagerDatabase } from './database'
@@ -26,6 +26,7 @@ export default class ManagerPlugin extends Plugin {
         );
 
         addIcon('dollar', ribbon);
+
         this.addRibbonIcon('dollar', 'Money Manager', async() => {
 
             const err = await this.detectDatabaseType()

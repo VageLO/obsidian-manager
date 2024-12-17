@@ -1,5 +1,6 @@
 import { Setting } from 'obsidian';
 import { EditModal } from './modal';
+import { SaveIcon } from '../../icons';
 
 export async function tagModal(this: EditModal) {
 	const tags = await this.database.listTags();

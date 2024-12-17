@@ -26,6 +26,17 @@ export class EditModal extends Modal {
 		this.callback(arg)
 	}
 
+	// TODO: Validation for local database
+	validate(detail: any, fields: any) {
+		detail.forEach((item: any) => {
+			item.loc.forEach((loc: any) => {
+				if (!fields.hasOwnProperty(loc))
+					return
+				fields[loc].classList.add('invalid-input')
+			})
+		})
+	}
+
     onClose() {
         const { contentEl, data } = this
 		if (data)

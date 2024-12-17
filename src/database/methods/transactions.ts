@@ -1,5 +1,4 @@
 import { ManagerDatabase } from '..';
-import { QueryExecResult } from 'sql.js';
 import { allTransactions } from './queries'
 import { createObjFromArray } from './dbHelpers';
 

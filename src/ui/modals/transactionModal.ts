@@ -1,4 +1,5 @@
 import { Setting, Notice, BaseComponent } from 'obsidian';
+import { ManagerAPIDatabase } from '../../api';
 import { EditModal } from './modal';
 
 // TODO: field validation
@@ -35,7 +36,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
     if (selected_transaction)
         transaction = {...selected_transaction}
 
-	new Setting(this.contentEl)
+	const date = new Setting(this.contentEl)
 		.setName("Date")
 		.addText((text) => {
 			text
@@ -176,7 +177,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 			toggle.setValue(false)
 	})
 
-	new Setting(this.contentEl)
+	const category = new Setting(this.contentEl)
 		.addDropdown((d) => {
 			categories.forEach((category: any) => {
 				d.addOption(category.id, category.title)
@@ -202,7 +203,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 		})
 		.setName("Tag")
 
-	new Setting(this.contentEl)
+	const description = new Setting(this.contentEl)
 		.setName("Description")
 		.addTextArea((text) => {
 			text
@@ -218,10 +219,33 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 			.setButtonText('💾')
 			.setCta()
 			.onClick(async() => {
-                if (selected_transaction)
-                    this.data = await this.database.updateTransaction(transaction)
-                else
-					this.data = await this.database.insertTransaction(transaction)
+				let res
+				const fields = {
+					account_id: from_account.components[0].selectEl,
+					category_id: category.components[0].selectEl,
+					to_account_id: to_account.components[0].selectEl,
+					transaction_type: type.components[0].selectEl,
+					amount: amount.components[0].inputEl,
+					to_amount: amount.components[1].inputEl,
+					date: date.components[0].inputEl,
+					description: description.components[0].inputEl,
+				}
+                if (selected_transaction) {
+					res = await this.database.updateTransaction(transaction)
+					if (res.error && this.database instanceof ManagerAPIDatabase) {
+						this.validate(res.detail, fields)
+						return
+					}
+					this.data = res
+				}
+                else {
+					res = await this.database.insertTransaction(transaction)
+					if (res.error && this.database instanceof ManagerAPIDatabase) {
+						this.validate(res.detail, fields)
+						return
+					}
+					this.data = res
+				}
 
 				this.close();
 			}));

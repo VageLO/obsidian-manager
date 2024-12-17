@@ -38,16 +38,16 @@ export async function insertTransaction(this: ManagerAPIDatabase, transaction: a
 	    method: "POST",
 	    headers: {"Cookie": `project=${this.project}`},
 		body: JSON.stringify(transaction),
+		throw: false,
 	}
-	try {
-		const res = await requestUrl(request)
-		if (res.status == 201)
-			return res.json
+	const res = await requestUrl(request)
+	if (res.status == 201)
+		return res.json
+	else if (!res.json.detail) {
+		new Notice("Error: detail not found")
+		return {}
 	}
-	catch(e) {
-		new Notice(e)
-		return {} 
-	}
+	return {error: true, detail: res.json.detail}
 }
 
 export async function updateTransaction(this: ManagerAPIDatabase, transaction: any) {
@@ -57,16 +57,16 @@ export async function updateTransaction(this: ManagerAPIDatabase, transaction: a
 	    method: "POST",
 	    headers: {"Cookie": `project=${this.project}`},
 		body: JSON.stringify(transaction),
+		throw: false,
 	}
-	try {
-		const res = await requestUrl(request)
-		if (res.status == 200)
-			return res.json
+	const res = await requestUrl(request)
+	if (res.status == 200)
+		return res.json
+	else if (!res.json.detail) {
+		new Notice("Error: detail not found")
+		return {}
 	}
-	catch(e) {
-		new Notice(e)
-		return {} 
-	}
+	return {error: true, detail: res.json.detail}
 }
 
 export async function deleteTransactions(this: ManagerAPIDatabase, ids: number[]) {
