@@ -12,7 +12,7 @@ import { Utils } from './utils';
 const success_color = "var(--text-success)"
 const error_color = "var(--text-error)"
 
-const colorAccount = (transaction, to_account_id: number) => {
+const colorAccount = (transaction: any, to_account_id: number) => {
     if(transaction.transaction_type == 'Deposit')
         return { color: success_color }
     if(to_account_id)
@@ -20,7 +20,7 @@ const colorAccount = (transaction, to_account_id: number) => {
     return { color: error_color }
 }
 
-const colorAmount = (transaction, to_account_id: number) => {
+const colorAmount = (transaction: any, to_account_id: number) => {
     if(transaction.transaction_type == 'Deposit')
         return { color: success_color }
     if(to_account_id)
@@ -44,12 +44,12 @@ export const List = () => {
 
     useEffect(() => {}, [transactions, mult])
 
-    const removeFromState = (id) => {
-        setTransactions(prev => prev.filter((item, _) => item.transaction.id != id));
+    const removeFromState = (id: any) => {
+        setTransactions((prev: any) => prev.filter((item: any) => item.transaction.id != id));
     }
 
     const callback = (data: any) => {
-        const t = transactions.map((item, _) => {
+        const t = transactions.map((item: any) => {
             if (item.transaction.id == data.transaction.id) {
                 item = data
             }
@@ -62,14 +62,14 @@ export const List = () => {
 		<div style={{margin: '10px'}}>
             <button
                 title="Select many transactions"
-                onClick={(e) => setMult(!mult)}>
+                onClick={() => setMult(!mult)}>
 			    ☰ 
 			</button>
 
             {mult ?
             <button
                 title="Delete Selected"
-                onClick={async(e) => {
+                onClick={async() => {
                     await db.deleteTransactions(transactionId)
                     transactionId.forEach((id) => {
                         removeFromState(id)
@@ -81,31 +81,33 @@ export const List = () => {
 
 			<Utils/>
 
-            {transactions.map((t, _) => {
+            {transactions.map((t: any) => {
                 return (
 					<div className="transaction-card" key={t.transaction.id}>
 						<div className="account">
-                            <p style={colorAccount(t.transaction)}>
+                            <p style={colorAccount(t.transaction, 0)}>
                                 {t.from_account.title}
                             </p>
-                            <p>{t.to_account ? " > " : ""}</p>
-                            <p style={colorAccount(t.transaction, t.transaction.to_account_id)}>
+							{t.to_account ? <p>{' > '}</p> : ""}
+							{t.to_account ? <p style={colorAccount(t.transaction, t.transaction.to_account_id)}>
                                 {t.to_account ? t.to_account.title : ""}
-                            </p>
+                            </p> : ""}
                         </div>
 						<div className="amount">
-						    <p style={colorAmount(t.transaction)}>
+						    <p style={colorAmount(t.transaction, 0)}>
 						        {t.transaction.amount + " " + t.from_account.currency}
 						    </p>
-						    <p>{t.transaction.to_amount > 0 ? " > " : ""}</p>
-						    <p style={colorAmount(t.transaction, t.transaction.to_account_id)}>
-						        {t.transaction.to_amount > 0 ? t.transaction.to_amount + 
-						            " " + t.to_account.currency : ""}
-						    </p>
+							{t.transaction.to_amount > 0 ? <p>{" > "}</p> : ""}
+							{t.transaction.to_amount > 0 ? 
+							<p style={colorAmount(t.transaction, t.transaction.to_account_id)}>
+						        {t.transaction.to_amount + 
+						            " " + t.to_account.currency}
+						    </p> : ""}
 						</div>
 						<p className="date">{t.transaction.date}</p>
 						<p className="operation-type">{t.transaction.transaction_type}</p>
 						<p className="desc">{t.transaction.description}</p>
+						{t.tag ? <p className="desc">{t.tag.title}</p> : ""}
 
 						{!mult ? <button
                             title="Edit"

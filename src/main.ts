@@ -15,7 +15,6 @@ export default class ManagerPlugin extends Plugin {
         await this.loadSettings()
         this.addSettingTab(new ManagerSettingTab(this.app, this));
 
-
         const err = await this.detectDatabaseType()
         if (err instanceof Error)
             new Notice(`Error: ${err.message}`)

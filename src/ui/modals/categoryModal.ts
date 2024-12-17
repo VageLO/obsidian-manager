@@ -1,7 +1,7 @@
 import { Setting } from 'obsidian';
 import { EditModal } from './modal';
 
-export async function createCategory(this: EditModal) {
+export async function categoryModal(this: EditModal) {
 	const categories = await this.database.listCategories();
 
 	interface Category {

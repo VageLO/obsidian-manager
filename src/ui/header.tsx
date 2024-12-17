@@ -2,21 +2,29 @@ import { useResourcesContext } from './resourcesProvider';
 import { useState, useEffect } from 'react'
 
 export const Header = () => {
-    const { accounts, categories, setTransactions, db } = useResourcesContext()
+    const { accounts, categories, tags, setTransactions, db } = useResourcesContext()
 
 	const [byAccount, setByAccount] = useState(null)
 	const [byCategory, setByCategory] = useState(null)
+	const [byTag, setByTag] = useState(null)
 
 	useEffect(() => {
-		const fetchData = async(account: any, category: any) => {
-			setTransactions(await db.listTransactions(account, category))
+		const fetchData = async(account: any, category: any, tag: any) => {
+			setTransactions(await db.listTransactions(account, category, tag))
 		}
-		if (byAccount || byCategory)
-			fetchData(byAccount, byCategory)
-		else if (byAccount == 0 || byCategory == 0)
-			fetchData(byAccount, byCategory)
+		if (byAccount || byCategory || byTag)
+			fetchData(byAccount, byCategory, byTag)
+		else if (byAccount == 0 || byCategory == 0 || byTag == 0)
+			fetchData(byAccount, byCategory, byTag)
 
-	}, [byAccount, byCategory, accounts, categories])
+	}, [
+			byAccount,
+			byCategory,
+			byTag,
+			accounts,
+			categories,
+			tags
+		])
 
     return (
 		<div>
@@ -49,6 +57,22 @@ export const Header = () => {
 						id={category.id}
 					>
                         {category.title}
+                    </option>
+                ))}
+            </select>
+			<select
+				onChange={(e) => {
+					const id = e.target.options[e.target.selectedIndex].id
+					setByTag(+id)
+				}}
+			>
+                <option id={'0'}>All Tags</option>
+		        {tags.map((tag: any) => (
+                    <option 
+						key={tag.id}
+						id={tag.id}
+					>
+                        {tag.title}
                     </option>
                 ))}
             </select>

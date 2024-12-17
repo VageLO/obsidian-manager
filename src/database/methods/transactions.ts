@@ -1,22 +1,27 @@
 import { ManagerDatabase } from '..';
 import { QueryExecResult } from 'sql.js';
-import { 
-	allTransactions,
-	getTransactionById,
-} from './queries'
+import { allTransactions } from './queries'
 import { createObjFromArray } from './dbHelpers';
 
-export async function listTransactions(this: ManagerDatabase, account_id?: number, category_id?: number) {
-	let res : QueryExecResult[] = []
+export async function listTransactions(
+	this: ManagerDatabase,
+	account_id?: number,
+	category_id?: number,
+	tag_id?: number
+) {
 
-	if (account_id && category_id)
-		res = this.db.exec(allTransactions(`AND Transactions.account_id=${account_id} AND Transactions.category_id=${category_id}`))
-	else if (account_id)
-		res = this.db.exec(allTransactions(`AND Transactions.account_id=${account_id}`))
-	else if (category_id)
-		res = this.db.exec(allTransactions(`AND Transactions.category_id=${category_id}`))
-	else
-		res = this.db.exec(allTransactions(''))
+	let conditions: string[] = []
+
+	if (account_id)
+		conditions.push(`Transactions.account_id == ${account_id}`)
+	if (category_id)
+		conditions.push(`Transactions.category_id == ${category_id}`)
+	if (tag_id)
+		conditions.push(`Transactions.tag_id == ${tag_id}`)
+
+	const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ""
+
+	const res = this.db.exec(allTransactions(where))
 
     if (!res.length)
         return []
@@ -33,10 +38,22 @@ export async function deleteTransactions(this: ManagerDatabase, ids: number[]) {
 }
 
 export async function insertTransaction(this: ManagerDatabase, t: any) {
-    this.db.run(`INSERT INTO Transactions (account_id, category_id, transaction_type, date, amount, description, to_amount, to_account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
+    this.db.run(`
+	INSERT INTO Transactions (
+	account_id,
+	category_id,
+	tag_id,
+	transaction_type,
+	date,
+	amount,
+	description,
+	to_amount,
+	to_account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+`, 
 [
     t.account_id,
     t.category_id,
+    t.tag_id,
     t.transaction_type,
     t.date,
     t.amount,
@@ -47,7 +64,7 @@ export async function insertTransaction(this: ManagerDatabase, t: any) {
     const id = this.db.exec('SELECT last_insert_rowid();')[0].values[0][0]
     await this.save()
 
-    const res = this.db.exec(getTransactionById, [id, id])
+    const res = this.db.exec(allTransactions(`WHERE Transactions.id = ?`), [id])
     if (!res.length)
         return {}
 
@@ -58,10 +75,23 @@ export async function insertTransaction(this: ManagerDatabase, t: any) {
 
 export async function updateTransaction(this: ManagerDatabase, t: any) {
 
-	this.db.exec(`UPDATE Transactions SET account_id = ?, category_id = ?, transaction_type = ?, date = ?, amount = ?, description = ?, to_account_id = ?, to_amount = ? WHERE id = ?`,
+	this.db.exec(`
+		UPDATE Transactions SET 
+		account_id = ?,
+		category_id = ?,
+		tag_id = ?,
+		transaction_type = ?,
+		date = ?,
+		amount = ?,
+		description = ?,
+		to_account_id = ?,
+		to_amount = ?
+		WHERE id = ?
+	`,
 	[
 		t.account_id,
 		t.category_id,
+		t.tag_id,
     	t.transaction_type,
     	t.date,
     	t.amount,
@@ -72,7 +102,7 @@ export async function updateTransaction(this: ManagerDatabase, t: any) {
 	])
 
     await this.save()
-	const res = this.db.exec(getTransactionById, [t.id, t.id])
+	const res = this.db.exec(allTransactions(`WHERE Transactions.id = ?`), [t.id])
 
     if (!res.length)
         return {}

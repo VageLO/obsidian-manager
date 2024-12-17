@@ -6,11 +6,13 @@ import { EditModal } from './modal';
 export async function transactionModal(this: EditModal, selected_transaction: any) {
 	const accounts = await this.database.listAccounts();
 	const categories = await this.database.listCategories();
+	const tags = await this.database.listTags();
 
 	interface Transaction {
 		account_id: number | null;
 		category_id: number | null;
 		to_account_id: number | null;
+		tag_id: number | null;
 		amount: number;
 		to_amount: number;
 		transaction_type: string;
@@ -22,6 +24,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 		account_id: null,
 		category_id: null,
 		to_account_id: null,
+		tag_id: null,
 		amount: 0,
 		to_amount: 0,
 		transaction_type: "Withdrawal",
@@ -143,6 +146,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 
                 if (value) {
 				    to_amountField.setDisabled(false)
+				    to_amountField.setValue(selected_transaction ? selected_transaction.to_amount : "")
 				    to_accountDropdown.setDisabled(false)
 
                     // Set transaction to type 'Transfer' and disable dropdown
@@ -172,9 +176,6 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 			toggle.setValue(false)
 	})
 
-
-        
-
 	new Setting(this.contentEl)
 		.addDropdown((d) => {
 			categories.forEach((category: any) => {
@@ -187,6 +188,19 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 				})
 		})
 		.setName("Category")
+
+	new Setting(this.contentEl)
+		.addDropdown((d) => {
+			tags.forEach((tag: any) => {
+				d.addOption(tag.id, tag.title)
+			})
+			d
+				.setValue(transaction.tag_id)
+				.onChange((value) => {
+					transaction.tag_id = +value;
+				})
+		})
+		.setName("Tag")
 
 	new Setting(this.contentEl)
 		.setName("Description")

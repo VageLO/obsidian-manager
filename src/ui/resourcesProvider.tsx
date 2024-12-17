@@ -7,6 +7,7 @@ export const ResourceProvider = ({children, db}) => {
     const [transactions, setTransactions] = useState([])
     const [accounts, setAccounts] = useState([])
     const [categories, setCategories] = useState([])
+    const [tags, setTags] = useState([])
     const [loading, setLoading] = useState(true)
     
 	const setResources = useCallback(async() => {
@@ -14,6 +15,7 @@ export const ResourceProvider = ({children, db}) => {
 		setTransactions(await db.listTransactions())
 		setAccounts(await db.listAccounts())
 		setCategories(await db.listCategories())
+		setTags(await db.listTags())
 		setLoading(false)
 	}, [])
 
@@ -29,6 +31,8 @@ export const ResourceProvider = ({children, db}) => {
         setCategories: setCategories,
         accounts: accounts,
         setAccounts: setAccounts,
+        tags: tags,
+        setTags: setTags,
     }
 
 	if (loading) {

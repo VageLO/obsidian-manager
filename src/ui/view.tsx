@@ -18,6 +18,9 @@ export class ManagerView extends ItemView {
 		return VIEW_TYPE;
 	}
 
+	getIcon() {
+		return 'dollar';
+	}
 	getDisplayText() {
 		return 'Money manager';
 	}

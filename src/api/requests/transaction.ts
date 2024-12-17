@@ -3,16 +3,25 @@ import { ManagerAPIDatabase } from '../database'
 
 // TODO: Make exceptions
 
-export async function listTransactions(this: ManagerAPIDatabase, account_id?: number, category_id?: number) {
+export async function listTransactions(
+	this: ManagerAPIDatabase,
+	account_id?: number,
+	category_id?: number,
+	tag_id?: number
+) {
 
+	let conditions: string[] = []
 	let url = `${this.apiURL}/transaction/list`
-	if (account_id && category_id)
-		url +=`?account_id=${account_id}&category_id=${category_id}`
-	else if (account_id)
-		url +=`?account_id=${account_id}`
-	else if (category_id)
-		url +=`?category_id=${category_id}`
+
+	if (account_id)
+		conditions.push(`account_id=${account_id}`)
+	if (category_id)
+		conditions.push(`category_id=${category_id}`)
+	if (tag_id)
+		conditions.push(`tag_id=${tag_id}`)
 	
+	url += conditions.length > 0 ? `?${conditions.join('&')}` : ""
+
 	const request: RequestUrlParam = {
 	    url: url,
 	    method: "GET",

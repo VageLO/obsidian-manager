@@ -1,7 +1,7 @@
 import { Setting, Notice } from 'obsidian';
 import { EditModal } from './modal';
 
-export async function createAccount(this: EditModal) {
+export async function accountModal(this: EditModal) {
 
 	const accounts = await this.database.listAccounts()
 

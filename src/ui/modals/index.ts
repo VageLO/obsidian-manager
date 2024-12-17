@@ -1,4 +1,5 @@
 export * from './transactionModal'
 export * from './accountModal'
 export * from './categoryModal'
+export * from './tagModal'
 export * from './modal'
