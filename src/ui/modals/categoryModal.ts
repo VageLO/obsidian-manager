@@ -1,3 +1,4 @@
+import { ManagerAPIDatabase } from '../../api';
 import { Setting } from 'obsidian';
 import { EditModal } from './modal';
 
@@ -72,10 +73,26 @@ export async function categoryModal(this: EditModal) {
 			.setButtonText('💾')
 			.setCta()
 			.onClick(async() => {
-				if (category.id)
-					this.data = { update: await this.database.updateCategory(category) }
-				else
-					this.data = await this.database.createCategory(category)
+				let res
+				const fields = {
+					title: title.components[0].inputEl,
+				}
+				if (category.id) {
+					res = await this.database.updateCategory(category)
+					if (res.error && this.database instanceof ManagerAPIDatabase) {
+						this.database.validate(res.detail, fields)
+						return
+					}
+					this.data = { update: res }
+				}
+				else {
+					res = await this.database.createCategory(category)
+					if (res.error && this.database instanceof ManagerAPIDatabase) {
+						this.database.validate(res.detail, fields)
+						return
+					}
+					this.data = res
+				}
 
 				this.close();
 			}));
