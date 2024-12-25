@@ -1,6 +1,6 @@
 import { Setting } from 'obsidian';
+import { ManagerAPIDatabase } from '../../api';
 import { EditModal } from './modal';
-import { SaveIcon } from '../../icons';
 
 export async function tagModal(this: EditModal) {
 	const tags = await this.database.listTags();
@@ -54,11 +54,26 @@ export async function tagModal(this: EditModal) {
 			.setButtonText('💾')
 			.setCta()
 			.onClick(async() => {
-				if (tag.id)
-					this.data = { update: await this.database.updateTag(tag) }
-				else
-					this.data = await this.database.createTag(tag)
+				let res
+				const fields = {
+					title: title.components[0].inputEl,
+				}
 
+				if (tag.id) {
+					res = await this.database.updateTag(tag)
+					if (res.error && this.database instanceof ManagerAPIDatabase) {
+						this.database.validate(res.detail, fields)
+						return
+					}
+					this.data = { update: res }
+				} else {
+					res = await this.database.createTag(tag)
+					if (res.error && this.database instanceof ManagerAPIDatabase) {
+						this.database.validate(res.detail, fields)
+						return
+					}
+					this.data = await this.database.createTag(tag)
+				}
 				this.close();
 			}));
 }

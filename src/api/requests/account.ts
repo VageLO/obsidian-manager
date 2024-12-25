@@ -1,4 +1,4 @@
-import { requestUrl, RequestUrlParam  } from 'obsidian';
+import { requestUrl, Notice, RequestUrlParam  } from 'obsidian';
 import { ManagerAPIDatabase } from '../database'
 
 export async function listAccounts(this: ManagerAPIDatabase) {
@@ -17,9 +17,16 @@ export async function updateAccount(this: ManagerAPIDatabase, account: any) {
         method: "POST",
         headers: {"Cookie": `project=${this.project}`},
 		body: JSON.stringify(account),
+		throw: false,
     }
     const res = await requestUrl(request)
-    return res.json
+	if (res.status == 200)
+		return res.json
+	else if (!res.json.detail) {
+		new Notice("Error: detail not found")
+		return {}
+	}
+	return {error: true, detail: res.json.detail}
 }
 
 export async function createAccount(this: ManagerAPIDatabase, account: any) {
@@ -28,9 +35,16 @@ export async function createAccount(this: ManagerAPIDatabase, account: any) {
         method: "POST",
         headers: {"Cookie": `project=${this.project}`},
 		body: JSON.stringify(account),
+		throw: false,
     }
     const res = await requestUrl(request)
-    return res.json
+	if (res.status == 201)
+		return res.json
+	else if (!res.json.detail) {
+		new Notice("Error: detail not found")
+		return {}
+	}
+	return {error: true, detail: res.json.detail}
 }
 
 export async function deleteAccount(this: ManagerAPIDatabase, id: number) {

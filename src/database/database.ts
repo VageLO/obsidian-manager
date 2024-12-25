@@ -8,34 +8,39 @@ export class ManagerDatabase {
     app: App
     db: Database
   
-    constructor (plugin: ManagerPlugin) {
-        this.plugin = plugin
-        this.app = plugin.app
-    }
+	constructor (plugin: ManagerPlugin) {
+		this.plugin = plugin
+		this.app = plugin.app
+	}
   
-    async initDatabase () {
-        const SQL = await initSqlJs({
-            locateFile: _file => this.pluginFile('sql-wasm.wasm', true),
-        })
-        
-        const file = this.plugin.settings.databasePath
-        if (file == '') {
-            const error = new Error('Set database file path in settings')
-            return error
-        }
+	async initDatabase () {
+		const SQL = await initSqlJs({
+			locateFile: _file => this.pluginFile('sql-wasm.wasm', true),
+		})
 
-        try {
-            const db = await this.app.vault.adapter.readBinary(this.plugin.settings.databasePath)
-            this.db = new SQL.Database(Buffer.from(db))
-        } catch (e) {
-            const error = new Error(e)
-            return error
-        }
-    }
-  
-    async query (sql: string, params?: BindParams) {
-        return this.db.exec(sql, params)
-    }
+		const file = this.plugin.settings.databasePath
+		if (file == '') {
+			const error = new Error('Set database file path in settings')
+			return error
+		}
+
+		try {
+			const db = await this.app.vault.adapter.readBinary(this.plugin.settings.databasePath)
+			this.db = new SQL.Database(Buffer.from(db))
+		} catch (e) {
+			const error = new Error(e)
+			return error
+		}
+	}
+
+	// TODO: Validation for local database
+	validate(detail: any, fields: any) {
+
+	}
+
+	async query (sql: string, params?: BindParams) {
+		return this.db.exec(sql, params)
+	}
 }
 
 Object.entries(methods).forEach(([name, method]) => {

@@ -1,4 +1,5 @@
 import { Setting, Notice } from 'obsidian';
+import { ManagerAPIDatabase } from '../../api';
 import { EditModal } from './modal';
 
 export async function accountModal(this: EditModal) {
@@ -85,11 +86,27 @@ export async function accountModal(this: EditModal) {
 			.setButtonText('💾')
 			.setCta()
 			.onClick(async() => {
-				if (account.id)
-					this.data = { update: await this.database.updateAccount(account) }
-				else
-					this.data = await this.database.createAccount(account)
-
+				let res
+				const fields = {
+					title: title.components[0].inputEl,
+					currency: currency.components[0].inputEl,
+					balance: balance.components[0].inputEl,
+				}
+				if (account.id) {
+					res = await this.database.updateAccount(account)
+					if (res.error && this.database instanceof ManagerAPIDatabase) {
+						this.database.validate(res.detail, fields)
+						return
+					}
+					this.data = { update: res }
+				} else {
+					res = await this.database.createAccount(account)
+					if (res.error && this.database instanceof ManagerAPIDatabase) {
+						this.database.validate(res.detail, fields)
+						return
+					}
+					this.data = res
+				}
 				this.close();
 			}));
 }

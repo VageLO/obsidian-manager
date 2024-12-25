@@ -2,8 +2,6 @@ import { Setting, Notice, BaseComponent } from 'obsidian';
 import { ManagerAPIDatabase } from '../../api';
 import { EditModal } from './modal';
 
-// TODO: field validation
-
 export async function transactionModal(this: EditModal, selected_transaction: any) {
 	const accounts = await this.database.listAccounts();
 	const categories = await this.database.listCategories();
@@ -230,18 +228,18 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 					date: date.components[0].inputEl,
 					description: description.components[0].inputEl,
 				}
+
                 if (selected_transaction) {
 					res = await this.database.updateTransaction(transaction)
 					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.validate(res.detail, fields)
+						this.database.validate(res.detail, fields)
 						return
 					}
 					this.data = res
-				}
-                else {
+				} else {
 					res = await this.database.insertTransaction(transaction)
 					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.validate(res.detail, fields)
+						this.database.validate(res.detail, fields)
 						return
 					}
 					this.data = res

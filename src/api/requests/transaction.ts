@@ -1,8 +1,6 @@
 import { Notice, requestUrl, RequestUrlParam  } from 'obsidian';
 import { ManagerAPIDatabase } from '../database'
 
-// TODO: Make exceptions
-
 export async function listTransactions(
 	this: ManagerAPIDatabase,
 	account_id?: number,
