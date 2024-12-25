@@ -33,9 +33,12 @@ export class ManagerDatabase {
 		}
 	}
 
-	// TODO: Validation for local database
-	validate(detail: any, fields: any) {
-
+	validateError(str_error: string) {
+		const splits = str_error.split('.')
+		return [{
+			loc: splits,
+			msg: str_error,
+		}]
 	}
 
 	async query (sql: string, params?: BindParams) {

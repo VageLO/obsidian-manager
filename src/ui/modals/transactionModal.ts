@@ -1,6 +1,12 @@
 import { Setting, Notice, BaseComponent } from 'obsidian';
-import { ManagerAPIDatabase } from '../../api';
+import { ManagerDatabase } from '../../database';
 import { EditModal } from './modal';
+
+function parseAmount(amount: string) {
+	const num = +Number.parseFloat(amount).toFixed(2);
+	if (num < 0) return NaN
+	else return num
+}
 
 export async function transactionModal(this: EditModal, selected_transaction: any) {
 	const accounts = await this.database.listAccounts();
@@ -41,6 +47,18 @@ export async function transactionModal(this: EditModal, selected_transaction: an
                 .setPlaceholder("YYYY-MM-DD")
 				.setValue(transaction.date)
 				.onChange((value) => {
+					const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+					const error = "Invalid date"
+    
+					if (!dateRegex.test(value)) {
+						new Notice(error)
+						return;
+					}
+					const date = Date.parse(value)
+					if (isNaN(date)) {
+						new Notice(error)
+						return;
+					}
 					transaction.date = value; 
 				})
 		})
@@ -51,7 +69,12 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 	    	text
 	    		.setValue(transaction.amount.toString())
 	    		.onChange((value) => {
-	    			transaction.amount = +value; 
+					const amount = parseAmount(value)
+					if (isNaN(amount)) {
+						new Notice("Invalid number")	
+						return
+					}
+	    			transaction.amount = amount
 	    		})
 	    })
 
@@ -62,7 +85,12 @@ export async function transactionModal(this: EditModal, selected_transaction: an
             .setPlaceholder("Converted Amount")
 			.setValue(transaction.to_amount ? transaction.to_amount.toString() : "")
 			.onChange((value) => {
-				transaction.to_amount = +value; 
+				const amount = parseAmount(value)
+				if (isNaN(amount)) {
+					new Notice("Invalid number")	
+					return
+				}
+				transaction.to_amount = amount 
 			})
 		text.inputEl.dataset.key = "to_amount"
 	})
@@ -124,7 +152,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 
     to_account.addToggle((toggle) => {
 		toggle
-			.setValue(true)
+			.setValue(false)
             .setTooltip("Enable transfer to account", {delay: 1, placement: 'left'})
 			.onChange((value) => {
 				let to_amountField : BaseComponent
@@ -163,10 +191,10 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 				    to_amountField.setDisabled(true)
 				    to_amountField.setValue("")
 
-                    // Set transaction type 'Withdrawal' and enable dropdown
+                    // Set transaction type to 'Withdrawal' or back to already existed type and enable dropdown
 				    const typeDropdown = type.components[0]
 				    typeDropdown.setDisabled(false)
-                    typeDropdown.setValue("Withdrawal")
+                    typeDropdown.setValue(selected_transaction ? selected_transaction.transaction_type : "Withdrawal")
                     transaction.transaction_type = typeDropdown.getValue() 
                 }
 			})
@@ -190,6 +218,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 
 	new Setting(this.contentEl)
 		.addDropdown((d) => {
+			d.addOption("null", "--Without tag--")
 			tags.forEach((tag: any) => {
 				d.addOption(tag.id, tag.title)
 			})
@@ -226,20 +255,21 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 					amount: amount.components[0].inputEl,
 					to_amount: amount.components[1].inputEl,
 					date: date.components[0].inputEl,
-					description: description.components[0].inputEl,
+					description: description?.components[0]?.inputEl,
 				}
 
                 if (selected_transaction) {
 					res = await this.database.updateTransaction(transaction)
-					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.database.validate(res.detail, fields)
+					if (res.error) {
+						this.validate(res.detail, fields)
 						return
 					}
 					this.data = res
 				} else {
 					res = await this.database.insertTransaction(transaction)
-					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.database.validate(res.detail, fields)
+					console.log(res)
+					if (res.error) {
+						this.validate(res.detail, fields)
 						return
 					}
 					this.data = res

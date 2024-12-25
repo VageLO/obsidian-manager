@@ -37,28 +37,33 @@ export async function deleteTransactions(this: ManagerDatabase, ids: number[]) {
 }
 
 export async function insertTransaction(this: ManagerDatabase, t: any) {
-    this.db.run(`
-	INSERT INTO Transactions (
-	account_id,
-	category_id,
-	tag_id,
-	transaction_type,
-	date,
-	amount,
-	description,
-	to_amount,
-	to_account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-`, 
-[
-    t.account_id,
-    t.category_id,
-    t.tag_id,
-    t.transaction_type,
-    t.date,
-    t.amount,
-    t.description,
-    t.to_amount,
-    t.to_account_id])
+    try {
+		this.db.run(`
+		INSERT INTO Transactions (
+		account_id,
+		category_id,
+		tag_id,
+		transaction_type,
+		date,
+		amount,
+		description,
+		to_amount,
+		to_account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+	[
+	    t.account_id,
+	    t.category_id,
+	    t.tag_id,
+	    t.transaction_type,
+	    t.date,
+	    t.amount,
+	    t.description,
+	    t.to_amount,
+	    t.to_account_id
+
+	])} catch (e) {
+		const detail = this.validateError(e.message)
+		return {error: true, detail: detail}
+	}
 
     const id = this.db.exec('SELECT last_insert_rowid();')[0].values[0][0]
     await this.save()

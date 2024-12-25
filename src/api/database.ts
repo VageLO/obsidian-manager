@@ -1,5 +1,5 @@
 import ManagerPlugin from '../main'
-import { App, RequestUrlParam, Notice, requestUrl } from 'obsidian'
+import { App, RequestUrlParam, requestUrl } from 'obsidian'
 import * as requests from './requests'
 
 export class ManagerAPIDatabase {
@@ -26,28 +26,6 @@ export class ManagerAPIDatabase {
 		}
 		catch(e) {
 			return new Error(`${this.apiURL} ${e.message}`)
-		}
-	}
-
-	validate(detail: any, fields: any) {
-		const map = new Map()
-
-		detail.forEach((item: any) => {
-			new Notice(item.msg, 5000)
-
-			item.loc.forEach((item: any) => {
-				if (item == 'body')
-					return	
-				if (!map.has(item))
-					map.set(item, item)
-			})
-		})
-
-		for (const [key, value] of Object.entries(fields)) {
-			if (!map.has(key) && value.classList.contains('invalid-input'))
-				value.classList.remove('invalid-input')
-			else if (map.has(key))
-				value.classList.add('invalid-input')
 		}
 	}
 }

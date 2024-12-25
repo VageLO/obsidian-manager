@@ -1,6 +1,7 @@
-import { Setting } from 'obsidian';
+import { Setting, Notice } from 'obsidian';
 import { ManagerAPIDatabase } from '../../api';
-import { EditModal } from './modal';
+import { EditModal, isEmpty } from './modal';
+import { isString } from 'util';
 
 export async function tagModal(this: EditModal) {
 	const tags = await this.database.listTags();
@@ -44,7 +45,12 @@ export async function tagModal(this: EditModal) {
 		.addText((text) => {
 			text
 				.onChange((value) => {
-					tag.title = value.trim(); 
+					const title = isEmpty(value)
+					if (!isString(title)) {
+						new Notice("Can't be empty")
+						return
+					}
+					tag.title = title; 
 				})
 		})
 

@@ -1,6 +1,7 @@
 import { ManagerAPIDatabase } from '../../api';
-import { Setting } from 'obsidian';
-import { EditModal } from './modal';
+import { Setting, Notice } from 'obsidian';
+import { EditModal, isEmpty } from './modal';
+import { isString } from 'util';
 
 export async function categoryModal(this: EditModal) {
 	const categories = await this.database.listCategories();
@@ -48,23 +49,27 @@ export async function categoryModal(this: EditModal) {
 		.addText((text) => {
 			text
 				.onChange((value) => {
-					category.title = value.trim(); 
+					const title = isEmpty(value)
+					if (!isString(title)) {
+						new Notice("Can't be empty")
+						return
+					}
+					category.title = title; 
 				})
 		})
 
 	const parent = new Setting(this.contentEl)
 		.setName("Parent Category")
 		.addDropdown((d) => {
+			d.addOption("null", "--Without parent--")
 			categories.forEach((item: any) => {
-				d
-					.addOption(item.id.toString(), item.title)
-					.setValue('')
+				d.addOption(item.id.toString(), item.title)
 			})
-
 			d
-				.onChange((value) => {
-					category.parent_id = +value;
-				})
+			.setValue('')
+			.onChange((value) => {
+				category.parent_id = +value;
+			})
 		})
 
 	new Setting(this.contentEl)

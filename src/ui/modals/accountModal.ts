@@ -1,6 +1,7 @@
 import { Setting, Notice } from 'obsidian';
+import { isString } from 'util';
 import { ManagerAPIDatabase } from '../../api';
-import { EditModal } from './modal';
+import { EditModal, isEmpty } from './modal';
 
 export async function accountModal(this: EditModal) {
 
@@ -53,7 +54,12 @@ export async function accountModal(this: EditModal) {
 		.addText((text) => {
 			text
 				.onChange((value) => {
-					account.title = value.trim(); 
+					const title = isEmpty(value)
+					if (!isString(title)) {
+						new Notice("Can't be empty")
+						return
+					}
+					account.title = title; 
 				})
 		})
 
@@ -62,7 +68,12 @@ export async function accountModal(this: EditModal) {
 		.addText((text) => {
 			text
 				.onChange((value) => {
-					account.currency = value.trim(); 
+					const currency = isEmpty(value)
+					if (!isString(currency)) {
+						new Notice("Can't be empty")
+						return
+					}
+					account.currency = currency; 
 				})
 		})
 
@@ -72,11 +83,12 @@ export async function accountModal(this: EditModal) {
 			text
                 .setValue(account.balance.toString())
 				.onChange((value) => {
-					if (Number.isNaN(+value)) {
+					const balance = Number.parseFloat(value).toFixed(2)
+					if (isNaN(balance)) {
 						new Notice("Please specify valid number")
 						return
 					}
-					account.balance = +value; 
+					account.balance = +balance; 
 				})
 		})
 
