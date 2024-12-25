@@ -107,14 +107,14 @@ export async function accountModal(this: EditModal) {
 				if (account.id) {
 					res = await this.database.updateAccount(account)
 					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.database.validate(res.detail, fields)
+						this.validate(res.detail, fields)
 						return
 					}
 					this.data = { update: res }
 				} else {
 					res = await this.database.createAccount(account)
 					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.database.validate(res.detail, fields)
+						this.validate(res.detail, fields)
 						return
 					}
 					this.data = res

@@ -68,14 +68,14 @@ export async function tagModal(this: EditModal) {
 				if (tag.id) {
 					res = await this.database.updateTag(tag)
 					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.database.validate(res.detail, fields)
+						this.validate(res.detail, fields)
 						return
 					}
 					this.data = { update: res }
 				} else {
 					res = await this.database.createTag(tag)
 					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.database.validate(res.detail, fields)
+						this.validate(res.detail, fields)
 						return
 					}
 					this.data = await this.database.createTag(tag)

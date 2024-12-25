@@ -85,7 +85,7 @@ export async function categoryModal(this: EditModal) {
 				if (category.id) {
 					res = await this.database.updateCategory(category)
 					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.database.validate(res.detail, fields)
+						this.validate(res.detail, fields)
 						return
 					}
 					this.data = { update: res }
@@ -93,7 +93,7 @@ export async function categoryModal(this: EditModal) {
 				else {
 					res = await this.database.createCategory(category)
 					if (res.error && this.database instanceof ManagerAPIDatabase) {
-						this.database.validate(res.detail, fields)
+						this.validate(res.detail, fields)
 						return
 					}
 					this.data = res
