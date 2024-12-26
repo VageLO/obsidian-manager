@@ -12,13 +12,18 @@ export async function listAccounts(this: ManagerDatabase) {
 
 export async function updateAccount(this: ManagerDatabase, account: any) {
 
-	this.db.exec(`UPDATE Accounts SET title = ?, currency = ?, balance = ? WHERE id = ?`,
-	[
-		account.title,
-		account.currency,
-		account.balance,
-		account.id,
-	])
+	try {
+		this.db.exec(`UPDATE Accounts SET title = ?, currency = ?, balance = ? WHERE id = ?`,
+		[
+			account.title,
+			account.currency,
+			account.balance,
+			account.id,
+		])
+	} catch(e) {
+		const detail = this.validateError(e.message)
+		return {error: true, detail: detail}
+	}
 
     await this.save()
 
@@ -32,11 +37,16 @@ export async function updateAccount(this: ManagerDatabase, account: any) {
 
 
 export async function createAccount(this: ManagerDatabase, account: any) {
-    this.db.run(`INSERT INTO Accounts (title, currency, balance) VALUES (?, ?, ?)`, [
-		account.title,
-		account.currency,
-		account.balance,
-	])
+	try {
+		this.db.run(`INSERT INTO Accounts (title, currency, balance) VALUES (?, ?, ?)`, [
+			account.title,
+			account.currency,
+			account.balance,
+		])
+	} catch(e) {
+		const detail = this.validateError(e.message)
+		return {error: true, detail: detail}
+	}
 
     const id = this.db.exec('SELECT last_insert_rowid();')[0].values[0][0]
     await this.save()

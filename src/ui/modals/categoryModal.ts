@@ -8,13 +8,13 @@ export async function categoryModal(this: EditModal) {
 
 	interface Category {
 		id: number | null;
-		title: string;
+		title: string | null;
 		parent_id: number | null;
 	}
 
 	const category: Category = {
 		id: null,
-		title: '',
+		title: null,
 		parent_id: null,
 	}
 
@@ -52,6 +52,7 @@ export async function categoryModal(this: EditModal) {
 					const title = isEmpty(value)
 					if (!isString(title)) {
 						new Notice("Can't be empty")
+						category.title = null; 
 						return
 					}
 					category.title = title; 
@@ -84,7 +85,7 @@ export async function categoryModal(this: EditModal) {
 				}
 				if (category.id) {
 					res = await this.database.updateCategory(category)
-					if (res.error && this.database instanceof ManagerAPIDatabase) {
+					if (res.error) {
 						this.validate(res.detail, fields)
 						return
 					}
@@ -92,7 +93,7 @@ export async function categoryModal(this: EditModal) {
 				}
 				else {
 					res = await this.database.createCategory(category)
-					if (res.error && this.database instanceof ManagerAPIDatabase) {
+					if (res.error) {
 						this.validate(res.detail, fields)
 						return
 					}

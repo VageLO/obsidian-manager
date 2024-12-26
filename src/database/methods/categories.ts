@@ -12,12 +12,17 @@ export async function listCategories(this: ManagerDatabase) {
 
 export async function updateCategory(this: ManagerDatabase, category: any) {
 
-	this.db.exec(`UPDATE Categories SET title = ?, parent_id = ? WHERE id = ?`,
-	[
-		category.title,
-		category.parent_id,
-		category.id,
-	])
+	try {
+		this.db.exec(`UPDATE Categories SET title = ?, parent_id = ? WHERE id = ?`,
+		[
+			category.title,
+			category.parent_id,
+			category.id,
+		])
+	} catch(e) {
+		const detail = this.validateError(e.message)
+		return {error: true, detail: detail}
+	}
 
     await this.save()
 
@@ -31,10 +36,15 @@ export async function updateCategory(this: ManagerDatabase, category: any) {
 
 
 export async function createCategory(this: ManagerDatabase, category: any) {
-    this.db.run(`INSERT INTO Categories (title, parent_id) VALUES (?, ?)`, [
-		category.title,
-		category.parent_id,
-	])
+	try {
+		this.db.run(`INSERT INTO Categories (title, parent_id) VALUES (?, ?)`, [
+			category.title,
+			category.parent_id,
+		])
+	} catch(e) {
+		const detail = this.validateError(e.message)
+		return {error: true, detail: detail}
+	}
 
     const id = this.db.exec('SELECT last_insert_rowid();')[0].values[0][0]
     await this.save()

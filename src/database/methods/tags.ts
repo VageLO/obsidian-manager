@@ -11,12 +11,16 @@ export async function listTags(this: ManagerDatabase) {
 }
 
 export async function updateTag(this: ManagerDatabase, tag: any) {
-
-	this.db.exec(`UPDATE Tags SET title = ? WHERE id = ?`,
-	[
-		tag.title,
-		tag.id,
-	])
+	try {
+		this.db.exec(`UPDATE Tags SET title = ? WHERE id = ?`,
+		[
+			tag.title,
+			tag.id,
+		])
+	} catch(e) {
+		const detail = this.validateError(e.message)
+		return {error: true, detail: detail}
+	}
 
     await this.save()
 
@@ -29,7 +33,12 @@ export async function updateTag(this: ManagerDatabase, tag: any) {
 }
 
 export async function createTag(this: ManagerDatabase, tag: any) {
-    this.db.run(`INSERT INTO Tags (title) VALUES (?)`, [tag.title])
+	try {
+		this.db.run(`INSERT INTO Tags (title) VALUES (?)`, [tag.title])
+	} catch (e) {
+		const detail = this.validateError(e.message)
+		return {error: true, detail: detail}
+	}
 
     const id = this.db.exec('SELECT last_insert_rowid();')[0].values[0][0]
     await this.save()

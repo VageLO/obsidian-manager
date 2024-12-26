@@ -8,12 +8,12 @@ export async function tagModal(this: EditModal) {
 
 	interface Tag {
 		id: number | null;
-		title: string;
+		title: string | null;
 	}
 
 	const tag: Tag = {
 		id: null,
-		title: '',
+		title: null,
 	}
 
 	new Setting(this.contentEl)
@@ -48,6 +48,7 @@ export async function tagModal(this: EditModal) {
 					const title = isEmpty(value)
 					if (!isString(title)) {
 						new Notice("Can't be empty")
+						tag.title = null; 
 						return
 					}
 					tag.title = title; 
@@ -67,18 +68,18 @@ export async function tagModal(this: EditModal) {
 
 				if (tag.id) {
 					res = await this.database.updateTag(tag)
-					if (res.error && this.database instanceof ManagerAPIDatabase) {
+					if (res.error) {
 						this.validate(res.detail, fields)
 						return
 					}
 					this.data = { update: res }
 				} else {
 					res = await this.database.createTag(tag)
-					if (res.error && this.database instanceof ManagerAPIDatabase) {
+					if (res.error) {
 						this.validate(res.detail, fields)
 						return
 					}
-					this.data = await this.database.createTag(tag)
+					this.data = res
 				}
 				this.close();
 			}));

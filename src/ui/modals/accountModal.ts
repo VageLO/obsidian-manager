@@ -9,14 +9,14 @@ export async function accountModal(this: EditModal) {
 
 	interface Account {
 		id: number | null;
-		title: string;
-		currency: string;
+		title: string | null;
+		currency: string | null;
 		balance: number;
 	}
 	const account: Account = {
 		id: null,
-		title: '',
-		currency: '',
+		title: null,
+		currency: null,
 		balance: 0,
 	}
 
@@ -57,6 +57,7 @@ export async function accountModal(this: EditModal) {
 					const title = isEmpty(value)
 					if (!isString(title)) {
 						new Notice("Can't be empty")
+						account.title = null; 
 						return
 					}
 					account.title = title; 
@@ -71,6 +72,7 @@ export async function accountModal(this: EditModal) {
 					const currency = isEmpty(value)
 					if (!isString(currency)) {
 						new Notice("Can't be empty")
+						account.currency = null; 
 						return
 					}
 					account.currency = currency; 
@@ -106,14 +108,14 @@ export async function accountModal(this: EditModal) {
 				}
 				if (account.id) {
 					res = await this.database.updateAccount(account)
-					if (res.error && this.database instanceof ManagerAPIDatabase) {
+					if (res.error) {
 						this.validate(res.detail, fields)
 						return
 					}
 					this.data = { update: res }
 				} else {
 					res = await this.database.createAccount(account)
-					if (res.error && this.database instanceof ManagerAPIDatabase) {
+					if (res.error) {
 						this.validate(res.detail, fields)
 						return
 					}
