@@ -1,5 +1,5 @@
 import ManagerPlugin from '../main'
-import { App, RequestUrlParam, requestUrl } from 'obsidian'
+import { App, RequestUrlParam, Notice, requestUrl } from 'obsidian'
 import * as requests from './requests'
 
 export class ManagerAPIDatabase {
@@ -27,6 +27,13 @@ export class ManagerAPIDatabase {
 		catch(e) {
 			return new Error(`${this.apiURL} ${e.message}`)
 		}
+	}
+
+	validateError(details: any, query: string){
+		details.forEach((detail: any) => {
+			const error = `URL: ${query}\nMessage: ${detail.msg}\nloc: ${detail.loc.join(',')}`
+			new Notice(error)
+		})
 	}
 }
 

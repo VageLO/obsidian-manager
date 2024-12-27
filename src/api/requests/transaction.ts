@@ -1,4 +1,4 @@
-import { Notice, requestUrl, RequestUrlParam  } from 'obsidian';
+import { Notice, requestUrl, RequestUrlParam } from 'obsidian';
 import { ManagerAPIDatabase } from '../database'
 
 export async function listTransactions(
@@ -9,7 +9,8 @@ export async function listTransactions(
 ) {
 
 	let conditions: string[] = []
-	let url = `${this.apiURL}/transaction/list`
+	const query = "/transaction/list" 
+	let url = `${this.apiURL}${query}`
 
 	if (account_id)
 		conditions.push(`account_id=${account_id}`)
@@ -24,8 +25,13 @@ export async function listTransactions(
 	    url: url,
 	    method: "GET",
 	    headers: {"Cookie": `project=${this.project}`},
+		throw: false,
 	}
 	const res = await requestUrl(request)
+
+	if (res.status != 200)
+		this.validateError(res.json.detail, query)
+
 	return res.json
 }
 
@@ -39,6 +45,7 @@ export async function insertTransaction(this: ManagerAPIDatabase, transaction: a
 		throw: false,
 	}
 	const res = await requestUrl(request)
+
 	if (res.status == 201)
 		return res.json
 	else if (!res.json.detail) {
@@ -68,15 +75,20 @@ export async function updateTransaction(this: ManagerAPIDatabase, transaction: a
 }
 
 export async function deleteTransactions(this: ManagerAPIDatabase, ids: number[]) {
-	const url = `${this.apiURL}/transaction/delete`
+	const query = "/transaction/delete"
+	const url = `${this.apiURL}${query}`
 	const request: RequestUrlParam = {
 	    url: url,
 	    method: "POST",
 	    headers: {"Cookie": `project=${this.project}`},
 		body: JSON.stringify(ids),
+		throw: false,
 	}
 	const res = await requestUrl(request)
 	if (res.status == 204)
 		return true 
+	else
+		this.validateError(res.json.detail, query)
+
 	return false
 }
