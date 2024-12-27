@@ -18,8 +18,8 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 		category_id: number | null;
 		to_account_id: number | null;
 		tag_id: number | null;
-		amount: number;
-		to_amount: number;
+		amount: number | null;
+		to_amount: number | null;
 		transaction_type: string;
 		date: string;
 		description: string;
@@ -72,6 +72,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 					const amount = parseAmount(value)
 					if (isNaN(amount)) {
 						new Notice("Invalid number")	
+						transaction.amount = null
 						return
 					}
 	    			transaction.amount = amount
@@ -88,6 +89,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 				const amount = parseAmount(value)
 				if (isNaN(amount)) {
 					new Notice("Invalid number")	
+					transaction.to_amount = null
 					return
 				}
 				transaction.to_amount = amount 

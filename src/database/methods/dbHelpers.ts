@@ -3,6 +3,7 @@ import { ManagerDatabase } from '..'
 export async function save (this: ManagerDatabase) {
     const data = this.db.export().buffer
     await this.app.vault.adapter.writeBinary(this.plugin.settings.databasePath, data)
+	this.db.run("PRAGMA foreign_keys = ON;");
 }
 
 export function pluginFile (this: ManagerDatabase, filename: string, absolute = false) {

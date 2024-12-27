@@ -27,6 +27,7 @@ export class ManagerDatabase {
 		try {
 			const db = await this.app.vault.adapter.readBinary(this.plugin.settings.databasePath)
 			this.db = new SQL.Database(Buffer.from(db))
+			this.db.run("PRAGMA foreign_keys = ON;");
 		} catch (e) {
 			const error = new Error(e)
 			return error
