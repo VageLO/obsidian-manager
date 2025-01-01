@@ -68,7 +68,9 @@ export const List = () => {
 		<div>
 			<button
         	    title="Select transactions"
-        	    onClick={() => setMult(!mult)}>
+        	    onClick={() => {
+					setTransactionId([])
+					setMult(!mult)}}>
 				{mult ? <MultiSelectCloseIcon/> : <MultiSelectIcon/>}
 			</button>
 
@@ -76,10 +78,12 @@ export const List = () => {
         	<button
         	    title="Delete selected"
         	    onClick={async() => {
-        	        await db.deleteTransactions(transactionId)
-        	        transactionId.forEach((id) => {
-        	            removeFromState(id)
-        	        })
+					if (transactionId.length != 0) {
+						await db.deleteTransactions(transactionId)
+        	        	transactionId.forEach((id) => {
+        	        	    removeFromState(id)
+        	        	})
+					}
 					setMult(false)
 			    }}>
 				<DeleteIcon/>
