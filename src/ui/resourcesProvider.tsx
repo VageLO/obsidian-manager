@@ -1,4 +1,4 @@
-import { createContext, useEffect, useContext, useState, useCallback } from 'react';
+import { createContext, useEffect, useContext, useState } from 'react';
 
 export const ResourcesContext = createContext();
 
@@ -10,18 +10,17 @@ export const ResourceProvider = ({children, db}) => {
     const [tags, setTags] = useState([])
     const [loading, setLoading] = useState(true)
     
-	const setResources = useCallback(async() => {
-		setLoading(true)
+	const setResources = async() => {
 		setTransactions(await db.listTransactions())
 		setAccounts(await db.listAccounts())
 		setCategories(await db.listCategories())
 		setTags(await db.listTags())
 		setLoading(false)
-	}, [])
+	} 
 
     useEffect(() => {
-        setResources()
-    }, [setResources])
+		setResources()
+    }, [])
 
     const resources = {
         db: db,

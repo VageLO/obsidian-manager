@@ -1,15 +1,20 @@
-import { StrictMode } from 'react';
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { Root, createRoot } from 'react-dom/client';
 import { Tabs } from './tabs';
 import { ResourceProvider } from './resourcesProvider';
+import { ManagerDatabase } from 'database';
+import { ManagerAPIDatabase } from 'api';
 
 export const VIEW_TYPE = 'manager-view';
 
 export class ManagerView extends ItemView {
 	root: Root | null = null;
+	db: ManagerDatabase | ManagerAPIDatabase
 
-	constructor(leaf: WorkspaceLeaf, db) {
+	constructor(
+		leaf: WorkspaceLeaf, 
+		db: ManagerAPIDatabase | ManagerDatabase
+	) {
 		super(leaf);
         this.db = db
 	}
@@ -28,11 +33,11 @@ export class ManagerView extends ItemView {
 	async onOpen() {
 		this.root = createRoot(this.containerEl.children[1]);
 		this.root.render(
-			<StrictMode>
+			<>
                 <ResourceProvider db={this.db}>
 					<Tabs/>
                 </ResourceProvider>
-			</StrictMode>,
+			</>,
 		);
 	}
 
