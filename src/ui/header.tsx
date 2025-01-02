@@ -1,26 +1,26 @@
 import { useResourcesContext } from './resourcesProvider';
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 
 export const Header = () => {
-    const { accounts, categories, tags, setTransactions, db } = useResourcesContext()
-
-	const [byAccount, setByAccount] = useState(null)
-	const [byCategory, setByCategory] = useState(null)
-	const [byTag, setByTag] = useState(null)
+	const { 
+		accounts,
+		categories,
+		tags,
+		setTransactions,
+		filter,
+		setFilter,
+		db
+	} = useResourcesContext()
 
 	useEffect(() => {
 		const fetchData = async(account: any, category: any, tag: any) => {
 			setTransactions(await db.listTransactions(account, category, tag))
 		}
-		if (byAccount || byCategory || byTag)
+		const { byAccount, byCategory, byTag } = filter
+		if (byAccount != null || byCategory != null || byTag != null)
 			fetchData(byAccount, byCategory, byTag)
-		else if (byAccount == 0 || byCategory == 0 || byTag == 0)
-			fetchData(byAccount, byCategory, byTag)
-
 	}, [
-			byAccount,
-			byCategory,
-			byTag,
+			filter,
 			accounts,
 			categories,
 			tags
@@ -31,7 +31,7 @@ export const Header = () => {
             <select
 				onChange={(e) => {
 					const id = e.target.options[e.target.selectedIndex].id
-					setByAccount(+id)
+					setFilter((prev: any) => ({...prev, byAccount: +id}))
 				}}
 			>
                 <option id={'0'}>All Accounts</option>
@@ -47,7 +47,7 @@ export const Header = () => {
             <select
 				onChange={(e) => {
 					const id = e.target.options[e.target.selectedIndex].id
-					setByCategory(+id)
+					setFilter((prev: any) => ({...prev, byCategory: +id}))
 				}}
 			>
                 <option id={'0'}>All Categories</option>
@@ -63,7 +63,7 @@ export const Header = () => {
 			<select
 				onChange={(e) => {
 					const id = e.target.options[e.target.selectedIndex].id
-					setByTag(+id)
+					setFilter((prev: any) => ({...prev, byTag: +id}))
 				}}
 			>
                 <option id={'0'}>All Tags</option>

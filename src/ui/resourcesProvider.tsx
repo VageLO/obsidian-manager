@@ -9,6 +9,11 @@ export const ResourceProvider = ({children, db}) => {
     const [categories, setCategories] = useState([])
     const [tags, setTags] = useState([])
     const [loading, setLoading] = useState(true)
+    const [filter, setFilter] = useState({
+		byAccount: null,
+		byCategory: null,
+		byTag: null,
+	})
     
 	const setResources = async() => {
 		setTransactions(await db.listTransactions())
@@ -32,6 +37,8 @@ export const ResourceProvider = ({children, db}) => {
         setAccounts: setAccounts,
         tags: tags,
         setTags: setTags,
+		filter: filter,
+		setFilter: setFilter,
     }
 
 	if (loading) {

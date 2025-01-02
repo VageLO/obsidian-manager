@@ -269,7 +269,6 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 					this.data = res
 				} else {
 					res = await this.database.insertTransaction(transaction)
-					console.log(res)
 					if (res.error) {
 						this.validate(res.detail, fields)
 						return

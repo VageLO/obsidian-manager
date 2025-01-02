@@ -21,12 +21,27 @@ export const Utils = () => {
 		setAccounts,
 		setCategories,
 		setTags,
+		filter,
 		db,
 	} = useResourcesContext()
 	const { app, plugin } = db
 
 	const addTransaction = (data: any) => {
-		setTransactions((prev: any) => [...prev, data])
+		const { byAccount, byCategory, byTag } = filter
+		const { transaction } = data
+
+		if (byAccount > 0 && byAccount != transaction.account_id)
+			return
+		if (byCategory > 0 && byCategory != transaction.category_id) 
+			return
+		if (byTag > 0 && byTag != transaction.tag_id)
+			return
+
+		setTransactions((prev: any) => {
+			let newTransactions = [...prev, data]
+			newTransactions.sort((a: any, b: any) => new Date(b.transaction.date) - new Date(a.transaction.date))
+			return newTransactions 
+		})
 	}
 
 	const setState = (state: any, data: any) => {
