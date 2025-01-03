@@ -1,5 +1,5 @@
 import { useResourcesContext } from './resourcesProvider';
-import { useEffect } from 'react'
+import { BaseSyntheticEvent, useEffect } from 'react'
 
 export const Header = () => {
 	const { 
@@ -9,16 +9,32 @@ export const Header = () => {
 		setTransactions,
 		filter,
 		setFilter,
+		prevFilter,
+		setPrevFilter,
 		db
 	} = useResourcesContext()
 
 	useEffect(() => {
-		const fetchData = async(account: any, category: any, tag: any) => {
-			setTransactions(await db.listTransactions(account, category, tag))
+		const fetchData = async(
+			account: any,
+			category: any,
+			tag: any,
+			month: string,
+			year: any,
+		) => {
+			setTransactions(await db.listTransactions(account, category, tag, month, year, setPrevFilter))
 		}
-		const { byAccount, byCategory, byTag } = filter
-		if (byAccount != null || byCategory != null || byTag != null)
-			fetchData(byAccount, byCategory, byTag)
+		const { byAccount, byCategory, byTag, byMonth, byYear } = filter
+
+		// TODO: horrible 🙀, maybe need refactoring.
+		if (byAccount != prevFilter.byAccount ||
+			byCategory != prevFilter.byCategory ||
+			byTag != prevFilter.byTag ||
+			byMonth != prevFilter.byMonth ||
+			byYear != prevFilter.byYear
+		)
+			console.log('header-filter-call')
+			fetchData(byAccount, byCategory, byTag, byMonth, byYear)
 	}, [
 			filter,
 			accounts,
@@ -29,6 +45,7 @@ export const Header = () => {
     return (
 		<div>
             <select
+				title='Sort by account'
 				onChange={(e) => {
 					const id = e.target.options[e.target.selectedIndex].id
 					setFilter((prev: any) => ({...prev, byAccount: +id}))
@@ -45,6 +62,7 @@ export const Header = () => {
                 ))}
             </select>
             <select
+				title='Sort by category'
 				onChange={(e) => {
 					const id = e.target.options[e.target.selectedIndex].id
 					setFilter((prev: any) => ({...prev, byCategory: +id}))
@@ -61,6 +79,7 @@ export const Header = () => {
                 ))}
             </select>
 			<select
+				title='Sort by tag'
 				onChange={(e) => {
 					const id = e.target.options[e.target.selectedIndex].id
 					setFilter((prev: any) => ({...prev, byTag: +id}))
@@ -76,6 +95,27 @@ export const Header = () => {
                     </option>
                 ))}
             </select>
+			{/* TODO: style */}
+			<input 
+				type={'month'}
+				title='Sort by month'
+				onInput={(e: BaseSyntheticEvent) => {
+					const month = e.target.value
+					setFilter((prev: any) => ({...prev, byMonth: month}))
+				}}
+			/>
+			<input 
+				title='Sort by year'
+				placeholder="YYYY"
+				type={'number'}
+				defaultValue={filter.byYear}
+				max={2099}
+				min={1900}
+				onBlur={(e: BaseSyntheticEvent) => {
+					const year = e.target.value
+					setFilter((prev: any) => ({...prev, byYear: year}))
+				}}
+			/>
 		</div>
 	);
 };

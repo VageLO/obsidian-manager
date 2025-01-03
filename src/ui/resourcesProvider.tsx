@@ -13,10 +13,13 @@ export const ResourceProvider = ({children, db}) => {
 		byAccount: null,
 		byCategory: null,
 		byTag: null,
+		byYear: new Date().getFullYear(),
+		byMonth: null,
 	})
+    const [prevFilter, setPrevFilter] = useState(filter)
     
 	const setResources = async() => {
-		setTransactions(await db.listTransactions())
+		setTransactions(await db.listTransactions(null, null, null, null, filter.byYear, setPrevFilter))
 		setAccounts(await db.listAccounts())
 		setCategories(await db.listCategories())
 		setTags(await db.listTags())
@@ -39,6 +42,8 @@ export const ResourceProvider = ({children, db}) => {
         setTags: setTags,
 		filter: filter,
 		setFilter: setFilter,
+		prevFilter: prevFilter,
+		setPrevFilter: setPrevFilter,
     }
 
 	if (loading) {

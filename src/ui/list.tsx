@@ -41,7 +41,7 @@ const searchById = (array: number[], id: number) : number => {
 
 export const List = () => {
 
-    const { transactions, setTransactions, setAccounts, db } = useResourcesContext()
+    const { transactions, setTransactions, db } = useResourcesContext()
 	const { app, plugin } = db
 
     const [transactionId, setTransactionId] = useState([])
@@ -49,8 +49,7 @@ export const List = () => {
     const [mult, setMult] = useState(false)
 
     useEffect(() => {
-		const fetchAccounts = async() => setAccounts(await db.listAccounts())
-		fetchAccounts()
+		console.log('list')
 	}, [transactions, mult])
 
     const removeFromState = (id: any) => {

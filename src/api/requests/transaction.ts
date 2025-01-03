@@ -5,20 +5,38 @@ export async function listTransactions(
 	this: ManagerAPIDatabase,
 	account_id?: number,
 	category_id?: number,
-	tag_id?: number
+	tag_id?: number,
+	month?: string,
+	year?: number,
+	state?: any,
 ) {
 
 	let conditions: string[] = []
 	const query = "/transaction/list" 
 	let url = `${this.apiURL}${query}`
 
-	if (account_id)
+	// TODO: Refactor 😿, maybe 🤣.
+	if (account_id) {
 		conditions.push(`account_id=${account_id}`)
-	if (category_id)
+		state((prev: any) => ({...prev, byAccount: account_id}))
+	}
+	if (category_id) {
 		conditions.push(`category_id=${category_id}`)
-	if (tag_id)
+		state((prev: any) => ({...prev, byCategory: category_id}))
+	}
+	if (tag_id) {
 		conditions.push(`tag_id=${tag_id}`)
-	
+		state((prev: any) => ({...prev, byTag: tag_id}))
+	}
+	if (month) {
+		conditions.push(`month=${month}`)
+		state((prev: any) => ({...prev, byMonth: month}))
+	}
+	if (year) {
+		conditions.push(`year=${year}`)
+		state((prev: any) => ({...prev, byYear: year}))
+	}
+
 	url += conditions.length > 0 ? `?${conditions.join('&')}` : ""
 
 	const request: RequestUrlParam = {

@@ -2,21 +2,51 @@ import { ManagerDatabase } from '..';
 import { allTransactions } from './queries'
 import { createObjFromArray } from './dbHelpers';
 
+export function getMonthStartEnd(YMString: string) {
+    const [year, month] = YMString.split('-').map(Number);
+    const end = new Date(year, month, 0);
+
+    return {
+        start: `${year}-${String(month).padStart(2, '0')}-01`,
+        end: `${year}-${String(month).padStart(2, '0')}-${end.getDate()}`
+    };
+}
+
 export async function listTransactions(
 	this: ManagerDatabase,
 	account_id?: number,
 	category_id?: number,
-	tag_id?: number
+	tag_id?: number,
+	month?: string,
+	year?: number,
+	state?: any,
 ) {
 
 	let conditions: string[] = []
 
-	if (account_id)
+	if (account_id) {
 		conditions.push(`Transactions.account_id == ${account_id}`)
-	if (category_id)
+		state((prev: any) => ({...prev, byAccount: account_id}))
+	}
+	if (category_id) {
 		conditions.push(`Transactions.category_id == ${category_id}`)
-	if (tag_id)
+		state((prev: any) => ({...prev, byCategory: category_id}))
+	}
+	if (tag_id) {
 		conditions.push(`Transactions.tag_id == ${tag_id}`)
+		state((prev: any) => ({...prev, byTag: tag_id}))
+	}
+	if (month) {
+		const { start, end } = getMonthStartEnd(month)
+		conditions.push(`Transactions.date >= '${start}'`)
+		conditions.push(`Transactions.date <= '${end}'`)
+		state((prev: any) => ({...prev, byMonth: month}))
+	}
+	if (year) {
+		conditions.push(`Transactions.date >= '${year}-01-01'`)
+		conditions.push(`Transactions.date <= '${year}-12-31'`)
+		state((prev: any) => ({...prev, byYear: year}))
+	}
 
 	const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ""
 
