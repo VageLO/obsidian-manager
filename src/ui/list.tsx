@@ -34,19 +34,16 @@ const colorAmount = (transaction: any, to_account_id: number) => {
     return { color: error_color }
 }
 
-const searchById = (array: number[], id: number) : number => {
-    const index = array.findIndex((item) => item == id) 
-    return index
-}
-
 export const List = () => {
 
     const { transactions, setTransactions, db } = useResourcesContext()
 	const { app, plugin } = db
 
-    const [transactionId, setTransactionId] = useState([])
+    const [checkedItems, setCheckedItems] = useState({})
 
     const [mult, setMult] = useState(false)
+    const [selectAll, setSelectAll] = useState(false)
+
 	const [contextMenu, setContextMenu] = useState({
 		mouseX: 0,
 		mouseY: 0,
@@ -103,18 +100,36 @@ export const List = () => {
 		handleClose();
 	};
 
-	const multiSelectHandler = (e) => {
-		const id = +e.target.id
-		const tId = searchById(transactionId, id)
-		
-		if (e.target.checked) {
-		    transactionId.push(id)
-		    setTransactionId(transactionId)
+	const deleteSelected = async() => {
+		const ids = []
+
+		for (const [key, value] of Object.entries(checkedItems)) {
+			if (value)
+				ids.push(key)
 		}
-		else if(tId != -1) {
-		    transactionId.splice(tId, 1)
-		    setTransactionId(transactionId)
+
+		if (ids.length) {
+			await db.deleteTransactions(ids)
+			ids.forEach(id => removeFromState(id))
 		}
+		setSelectAll(false)
+		setCheckedItems({})
+		setMult(false)
+	}
+
+	const handleSelect = (event: BaseSyntheticEvent) => {
+		const { name, checked } = event.target
+		setCheckedItems({...checkedItems, [name]: checked})	
+	}
+
+	const handleSelectAll = (event: BaseSyntheticEvent) => {
+		const { checked } = event.target
+		setSelectAll(checked)
+		const updatedCheckedItems = transactions.reduce((acc, item) => {
+			acc[item.transaction.id] = checked;
+			return acc;
+		}, {})
+		setCheckedItems(updatedCheckedItems)
 	}
 
     return (
@@ -122,7 +137,7 @@ export const List = () => {
 			<button
         	    title="Select transactions"
         	    onClick={() => {
-					setTransactionId([])
+					setCheckedItems({})
 					setMult(!mult)}}>
 				{mult ? <MultiSelectCloseIcon/> : <MultiSelectIcon/>}
 			</button>
@@ -130,25 +145,23 @@ export const List = () => {
         	{mult ?
         	<button
         	    title="Delete selected"
-        	    onClick={async() => {
-					if (transactionId.length != 0) {
-						await db.deleteTransactions(transactionId)
-        	        	transactionId.forEach((id) => {
-        	        	    removeFromState(id)
-        	        	})
-					}
-					setMult(false)
-			    }}>
+        	    onClick={deleteSelected}>
 				<DeleteIcon/>
 			</button> : ""}
 
 			<Utils/>
 
-			<table>
+			<table style={{width: '100%'}}>
 				<thead>
 					<tr>
 						{mult ?
-						<th className="cell" scope="col"></th> : ""}
+						<th className="cell" scope="col">
+							<input
+                        	    type="checkbox"
+                        	    name="cb_transaction"
+								checked={selectAll}
+								onChange={handleSelectAll}/>
+						</th> : ""}
 						<th className="cell" scope="col">Date</th>
 						<th className="cell" scope="col">Account</th>
 						<th className="cell" scope="col">To Account</th>
@@ -171,9 +184,9 @@ export const List = () => {
 						<td className="cell">
 							<input
                         	    type="checkbox"
-                        	    name="cb_transaction" 
-                        	    id={t.transaction.id}
-								onChange={(e) => multiSelectHandler(e)}/>
+                        	    name={t.transaction.id}
+								checked={checkedItems[t.transaction.id] || false}
+								onChange={handleSelect}/>
 						</td> : ""}
 						<th className="cell" scope="row">{t.transaction.date}</th>
 
@@ -219,7 +232,7 @@ export const List = () => {
 				  <li onClick={() => handleEditTransaction(contextMenu.transaction)}>Edit Transaction</li>
 				  <li onClick={async() => {
 					await db.deleteTransactions([contextMenu.transaction.id])
-                    removeFromState(contextMenu.transaction.id)}}>Delete Transaction</li>
+					removeFromState(contextMenu.transaction.id)}}>Delete Transaction</li>
 				</ul>}
 		</div>
 	);

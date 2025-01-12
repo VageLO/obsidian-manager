@@ -34,6 +34,8 @@ hr {
 	background-color: #383838;
 	border-radius: 5px;
 	box-sizing: border-box;	
+	list-style-type: none;
+	padding: 0px;
 }
 
 .context-menu li {
@@ -43,4 +45,5 @@ hr {
 .context-menu li:hover {
 	cursor: pointer;
 	background-color: #000000;
+	border-radius: 5px;
 }
