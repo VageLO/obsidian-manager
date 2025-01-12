@@ -1,6 +1,7 @@
 import { 
     useState,
     useEffect,
+    BaseSyntheticEvent,
 } from 'react';
 import { 
     transactionModal,
@@ -12,7 +13,6 @@ import {
 	MultiSelectIcon,
 	MultiSelectCloseIcon,
 	DeleteIcon,
-	EditIcon,
 } from '../icons';
 
 const success_color = "var(--text-success)"
@@ -47,10 +47,22 @@ export const List = () => {
     const [transactionId, setTransactionId] = useState([])
 
     const [mult, setMult] = useState(false)
+	const [contextMenu, setContextMenu] = useState({
+		mouseX: 0,
+		mouseY: 0,
+		transaction: {},
+		clicked: false,
+	})
 
     useEffect(() => {
 		console.log('list')
-	}, [transactions, mult])
+		if (contextMenu.clicked) {
+			document.addEventListener('click', handleClose)
+			return () => {
+				document.removeEventListener('click', handleClose)
+			}
+		}
+	}, [transactions, mult, contextMenu])
 
     const removeFromState = (id: any) => {
         setTransactions((prev: any) => prev.filter((item: any) => item.transaction.id != id));
@@ -65,6 +77,45 @@ export const List = () => {
         })
         setTransactions(t)
     }
+
+	const handleContextMenu = (event: BaseSyntheticEvent, transaction: any) => {
+		event.preventDefault();
+		if (!contextMenu.clicked) {
+			const newContext = {
+				mouseX: event.clientX - 345,
+				mouseY: event.clientY - 60,
+				transaction: transaction,
+				clicked: true,
+			}
+			setContextMenu(newContext)
+		} 
+	};
+
+	const handleClose = () => {
+		setContextMenu(prev => ({...prev, clicked: false}));
+	};
+
+	const handleEditTransaction = (transaction: any) => {
+		const modal = new EditModal(app, plugin.database, transactionModal, 
+        (data) => callback(data))
+		modal.load(transaction)
+		modal.open()
+		handleClose();
+	};
+
+	const multiSelectHandler = (e) => {
+		const id = +e.target.id
+		const tId = searchById(transactionId, id)
+		
+		if (e.target.checked) {
+		    transactionId.push(id)
+		    setTransactionId(transactionId)
+		}
+		else if(tId != -1) {
+		    transactionId.splice(tId, 1)
+		    setTransactionId(transactionId)
+		}
+	}
 
     return (
 		<div>
@@ -93,80 +144,83 @@ export const List = () => {
 
 			<Utils/>
 
-            {transactions.map((t: any) => {
+			<table>
+				<thead>
+					<tr>
+						{mult ?
+						<th className="cell" scope="col"></th> : ""}
+						<th className="cell" scope="col">Date</th>
+						<th className="cell" scope="col">Account</th>
+						<th className="cell" scope="col">To Account</th>
+						<th className="cell" scope="col">Category</th>
+						<th className="cell" scope="col">Tag</th>
+						<th className="cell" scope="col">Type</th>
+						<th className="cell" scope="col">Amount</th>
+						<th className="cell" scope="col">To Amount</th>
+						<th className="cell" scope="col">Description</th>
+					</tr>
+				</thead>
+				<tbody>
+				{transactions.map((t: any) => {
                 return (
-					<div className="transaction-card" key={t.transaction.id}>
-						<div>
-							<div className="account">
-                        	    <p style={colorAccount(t.transaction, 0)}>
-                        	        {t.from_account.title}
-                        	    </p>
-								{t.to_account ? <p>{' > '}</p> : ""}
-								{t.to_account ? <p style={colorAccount(t.transaction, t.transaction.to_account_id)}>
-                        	        {t.to_account ? t.to_account.title : ""}
-                        	    </p> : ""}
-                        	</div>
-							<div className="amount">
-							    <p style={colorAmount(t.transaction, 0)}>
-							        {t.transaction.amount + " " + t.from_account.currency}
-							    </p>
-								{t.transaction.to_amount > 0 ? <p>{" > "}</p> : ""}
-								{t.transaction.to_amount > 0 ? 
-								<p style={colorAmount(t.transaction, t.transaction.to_account_id)}>
-							        {t.transaction.to_amount + 
-							            " " + t.to_account.currency}
-							    </p> : ""}
-							</div>
-							<p className="date">{t.transaction.date}</p>
-							<p className="operation-type">{t.transaction.transaction_type}</p>
-							{t.tag ? <p className="desc">{t.tag.title}</p> : ""}
-							<p className="desc">{t.transaction.description}</p>
-						</div>
-						<div style={{display: 'grid'}}>
-							{!mult ? <button
-                        	    title="Edit"
-                        	    onClick={() => {
-								    const modal = new EditModal(app, plugin.database, transactionModal, 
-                        	            (data) => callback(data))
-									modal.load(t.transaction)
-									modal.open()
-							    }}
-                        	>
-								<EditIcon/>
-							</button> : ""}
-							{!mult ? <button
-                        	    title="Delete"
-                        	    onClick={async() => {
-                        	        await db.deleteTransactions([t.transaction.id])
-                        	        removeFromState(t.transaction.id)
-							    }}
-                        	>
-								<DeleteIcon/> 
-							</button> : ""}
-							{mult ?
-                        	<input
+					<tr 
+						key={t.transaction.id}
+						onContextMenu={(e) => handleContextMenu(e, t.transaction)}
+					>
+						{mult ?
+						<td className="cell">
+							<input
                         	    type="checkbox"
                         	    name="cb_transaction" 
                         	    id={t.transaction.id}
-                        	    onChange={(e) => {
-                        	        const id = +e.target.id
+								onChange={(e) => multiSelectHandler(e)}/>
+						</td> : ""}
+						<th className="cell" scope="row">{t.transaction.date}</th>
 
-                        	        const tId = searchById(transactionId, id)
+						{t.from_account ? <td className="fixed-width" style={colorAccount(t.transaction, 0)}>{t.from_account.title}</td> : 
+							<td className="fixed-width"></td>}
 
-                        	        if (e.target.checked) {
-                        	            transactionId.push(id)
-                        	            setTransactionId(transactionId)
-                        	        }
-                        	        else if(tId != -1) {
-                        	            transactionId.splice(tId, 1)
-                        	            setTransactionId(transactionId)
-                        	        }
-                        	    }}
-                        	/> : ""}
-						</div>
-					</div>
+						{t.to_account ? 
+							<td className="fixed-width" style={colorAccount(t.transaction, t.transaction.to_account_id)}>
+								{t.to_account.title}
+							</td> : <td className="cell"></td>}
+
+						{t.category ? <td className="cell">{t.category.title}</td> : <td className="cell"></td>}
+
+						{t.tag ? <td className="cell">{t.tag.title}</td> : <td className="cell"></td>}
+
+						<td className="cell">{t.transaction.transaction_type}</td>
+
+						<td className="cell" style={colorAmount(t.transaction, 0)}>
+							{t.transaction.amount + " " + t.from_account.currency}
+						</td>
+
+						{t.transaction.to_amount > 0 ? 
+							<td className="cell" style={colorAmount(t.transaction, t.transaction.to_account_id)}>
+								{t.transaction.to_amount + 
+									" " + t.to_account.currency}
+							</td> : <td className="cell"></td>}
+
+						<td className="cell">{t.transaction.description}</td>
+					</tr>
 				)
 			})}
+				</tbody>
+			</table>
+			{contextMenu.clicked &&
+				<ul 
+				  className="context-menu" 
+				  style={{
+					position: 'fixed',
+					left: contextMenu.mouseX + 'px',
+					top: contextMenu.mouseY + 'px'
+				  }}
+				>
+				  <li onClick={() => handleEditTransaction(contextMenu.transaction)}>Edit Transaction</li>
+				  <li onClick={async() => {
+					await db.deleteTransactions([contextMenu.transaction.id])
+                    removeFromState(contextMenu.transaction.id)}}>Delete Transaction</li>
+				</ul>}
 		</div>
 	);
 }

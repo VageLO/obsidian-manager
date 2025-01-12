@@ -1,42 +1,25 @@
-.transaction-card {
-    background-color: var(--background-primary);
-    border-color: var(--background-modifier-border-focus);
-    border-style: solid;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
-    padding: 10px;
-    width: 100%;
-    display: grid;
-	grid-template-columns: 1fr auto;
-}
-.amount, .account {
-    font-size: 15px;
-    font-weight: bold;
-    margin-top: 0px;
-    margin-bottom: 10px;
-    display: block;
-}
-.account > p {
-    display: inline;
-}
-.amount > p {
-    display: inline;
-}
-.date {
-    font-size: 14px;
-    font-weight: bold;
-    margin: 0px;
-    color: var(--text-normal);
-}
-.operation-type, .desc {
-    font-size: 12px;
-    margin: 0px;
-    color: var(--text-faint);
-}
 .invalid-input, input.invalid-input {
 	border: 2px solid var(--color-red);
 }
+.cell, .fixed-width {
+	border: 1px solid #ddd;
+	padding: 8px;
+	textAlign: 'left';
+}
+.fixed-width > p {
+	width: 50px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	transition: width 0.3s ease, white-space 0.3s ease;
+}
+.fixed-width:hover p {
+	display: inline;
+	width: auto;
+	white-space: normal;
+	min-width: 150px;
+}
+
 button, select {
 	margin-right: 10px;
 	margin-bottom: 10px;
@@ -44,4 +27,20 @@ button, select {
 hr {
 	margin-bottom: 20px;
 	margin-top: 20px;
+}
+.context-menu {
+	position: fixed;
+	width: 200px;
+	background-color: #383838;
+	border-radius: 5px;
+	box-sizing: border-box;	
+}
+
+.context-menu li {
+	padding: 5px 10px;
+}
+
+.context-menu li:hover {
+	cursor: pointer;
+	background-color: #000000;
 }
