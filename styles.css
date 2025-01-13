@@ -1,7 +1,20 @@
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table > thead tbody tfoot {
+    display: block;
+}
+.table > tfoot {
+    position: sticky;
+	background-color: #383838;
+    bottom: 0;
+    z-index: 1;
+}
 .invalid-input, input.invalid-input {
 	border: 2px solid var(--color-red);
 }
-.cell, .fixed-width {
+.cell, .fixed-width, tfoot {
 	border: 1px solid #ddd;
 	padding: 8px;
 	textAlign: 'left';
@@ -30,6 +43,7 @@ hr {
 }
 .context-menu {
 	position: fixed;
+    z-index: 2;
 	width: 200px;
 	background-color: #383838;
 	border-radius: 5px;

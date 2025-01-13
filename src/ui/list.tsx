@@ -40,6 +40,10 @@ export const List = () => {
 	const { app, plugin } = db
 
     const [checkedItems, setCheckedItems] = useState({})
+    const [grandTotal, setGrandTotal] = useState({
+		type: 'Total',
+		total: '',
+	})
 
     const [mult, setMult] = useState(false)
     const [selectAll, setSelectAll] = useState(false)
@@ -53,6 +57,7 @@ export const List = () => {
 
     useEffect(() => {
 		console.log('list')
+		countTotal(grandTotal.type)
 		if (contextMenu.clicked) {
 			document.addEventListener('click', handleClose)
 			return () => {
@@ -132,6 +137,39 @@ export const List = () => {
 		setCheckedItems(updatedCheckedItems)
 	}
 
+	const countTotal = (type: string) => {
+		let res = `${type}: `
+		const count = transactions.reduce((acc, t) => {
+			const { transaction, from_account } = t
+			const currency = from_account.currency;
+			const amount = Number.parseFloat(transaction.amount);
+
+			if (!acc[currency] && transaction.transaction_type != "Transfer") {
+				acc[currency] = {
+					"Withdrawal": 0,
+					"Deposit": 0,
+					"Total": 0,
+				};
+			}
+
+			if (transaction.transaction_type == "Withdrawal") {
+				acc[currency]["Withdrawal"] -= amount;
+				acc[currency]["Total"] -= amount;
+			}
+			if (transaction.transaction_type == "Deposit") {
+				acc[currency]["Deposit"] += amount;
+				acc[currency]["Total"] += amount;
+			}
+			return acc;
+		}, {});
+
+		Object.keys(count).forEach(key => {
+			res += `${count[key][type].toFixed(2)} ${key}; `
+		});
+
+		setGrandTotal({ type: type, total: res })
+	}
+
     return (
 		<div>
 			<button
@@ -151,7 +189,7 @@ export const List = () => {
 
 			<Utils/>
 
-			<table style={{width: '100%'}}>
+			<table className="table">
 				<thead>
 					<tr>
 						{mult ?
@@ -219,6 +257,21 @@ export const List = () => {
 				)
 			})}
 				</tbody>
+				<tfoot>
+					<tr>
+						<td colSpan={2} className="cell">
+							<select
+								defaultValue={grandTotal.type}
+								onChange={(e) => countTotal(e.target.value)}
+							>
+								<option>Total</option>
+								<option>Withdrawal</option>
+								<option>Deposit</option>
+							</select>
+						</td>
+						<td colSpan={7} className="cell">{grandTotal.total}</td>
+					</tr>
+				</tfoot>
 			</table>
 			{contextMenu.clicked &&
 				<ul 
