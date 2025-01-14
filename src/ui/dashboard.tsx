@@ -1,33 +1,99 @@
 import { useEffect } from 'react';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
 import { useResourcesContext } from './resourcesProvider';
-import { Pie, Bar } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 import { Header } from './header';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 export const Dashboard = () => {
     const { accounts, transactions } = useResourcesContext()
 	
 	const options = {
-		maintainAspectRatio: false,
-		responsive: false,
-		width: 500,
-		height: 500,
+		plugins: {
+			title: {
+				display: true,
+				align: 'center',
+				color: '#ffffff',
+				font: {
+					size: 16,
+				},
+				padding: {
+                    top: 100,
+                    bottom: 0, 
+                }
+			},
+			legend: {
+				position: 'right',
+				align: 'center',
+				labels: {
+					boxWidth: 20,
+					padding: 10,
+					generateLabels(chart) {
+						const data = chart.data;
+						if (data.labels.length && data.datasets.length) {
+							return data.labels.map((label, i) => {
+								const dataset = data.datasets[0];
+								const fillStyle = dataset.backgroundColor[i];
+								const strokeStyle = dataset.borderColor ? dataset.borderColor[i] : '#ffffff';
+
+								return {
+									text: `${Number(dataset.data[i]).toFixed(2)} ${label}`,
+									fillStyle: fillStyle,
+									fontColor: '#ffffff',
+									strokeStyle: strokeStyle,
+									lineWidth: dataset.borderWidth,
+									hidden: isNaN(dataset.data[i]) || chart.getDatasetMeta(0).data[i].hidden,
+									index: i
+								};
+							});
+						}	
+						return []
+					}
+				},
+				onClick: (e, legendItem, legend) => {
+					const index = legendItem.index;
+					const ci = legend.chart;
+					const meta = ci.getDatasetMeta(0);
+					const item = meta.data[index];
+
+					if (item.hidden == null || item.hidden == false) {
+						item.hidden = true;
+						legendItem.hidden = true;
+					} else {
+						item.hidden = null;
+						legendItem.hidden = false;
+					}
+					ci.update();
+				},
+			}
+		},
 	};
+
+	const generateDynamicColors = (num: number) => {
+		const colors = [];
+		for (let i = 0; i < num; i++) {
+			colors.push(`rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.2)`);
+		}
+		return colors;
+	}
 
 	const accountsData = () => {
 		let data: number[] = []
 		let labels: string[] = []
 
-		accounts.forEach((acc: any) => {
-			labels.push(acc.title)
-			data.push(acc.balance)
-		})
+		accounts
+			.sort((a, b) => b.balance - a.balance)
+			.forEach((acc: any) => {
+				labels.push(acc.title)
+				data.push(acc.balance)
+			})
 
 		const chartData = {
 			datasets: [{
 				data: data,
+				backgroundColor: generateDynamicColors(accounts.length),
+				borderWidth: 1,
 				label: 'balance',
 			}],
 			labels: labels
@@ -58,20 +124,28 @@ export const Dashboard = () => {
 
 	const income_expense = count()
 
-	const categoriesData = (type: string) => {
+	const categoriesData = (type: string, sortedOrder: 'asc' | 'desc') => {
 		let data: number[] = []
 		let labels: string[] = []
+		let color_count: number = 0
 
-		Object.keys(income_expense).forEach(key => {
-			if(income_expense[key][type]) {
+		Object.entries(income_expense)
+			.filter(([_, value]) => value[type])
+			.sort((a, b) => {
+				const comparison = a[1][type] - b[1][type]
+				return sortedOrder === 'asc' ? comparison : -comparison
+			})
+			.forEach(([key, value]) => {
 				labels.push(key)
-				data.push(income_expense[key][type])
-			}
-		});
+				data.push(value[type])
+				color_count += 1
+			})
 
 		const chartData = {
 			datasets: [{
 				data: data,
+				backgroundColor: generateDynamicColors(color_count),
+				borderWidth: 1, 
 			}],
 			labels: labels,
 		}
@@ -83,9 +157,50 @@ export const Dashboard = () => {
     return (
 		<div>
 			<Header/>
-			<Pie data={accountsData()} options={options} />
-			<Pie data={categoriesData("Withdrawal")} options={options} />
-			<Pie data={categoriesData("Deposit")} options={options} />
+			<div className='canvas-container'>
+				<div className='canvas-item'>
+					<Pie 
+						data={accountsData()} 
+						options={{
+							...options,
+							plugins: {
+								...options.plugins,
+								title: {
+									...options.plugins.title,
+									text: 'Accounts'
+								}
+							}
+						}} />
+				</div>
+				<div className='canvas-item'>
+					<Pie 
+						data={categoriesData("Withdrawal", "asc")}
+						options={{
+							...options,
+							plugins: {
+								...options.plugins,
+								title: {
+									...options.plugins.title,
+									text: 'Expenses'
+								}
+							}
+						}} />
+				</div>
+				<div className='canvas-item'>
+					<Pie 
+						data={categoriesData("Deposit", "desc")}
+						options={{
+							...options,
+							plugins: {
+								...options.plugins,
+								title: {
+									...options.plugins.title,
+									text: 'Income'
+								}
+							}
+						}} />
+				</div>
+			</div>
 		</div>
 	);
 };
