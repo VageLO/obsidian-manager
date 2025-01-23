@@ -60,12 +60,16 @@ export class ManagerSettingTab extends PluginSettingTab {
 						return
 
 					const path = adapter.path.join(adapter.basePath, plugin.settings.databasePath)
-					if (!adapter.fs.existsSync(path) && value) {
-						new Notice(`${path} doesn't exist`)
-						const localdb_toggle = localdb.components[1]
-						localdb_toggle.setValue(false)
-						return
-					} else if (!adapter.fs.existsSync(path) && !value)
+					if (adapter.path.extname(path) == '.db' && 
+						!adapter.fs.existsSync(path) && value) {
+						adapter.fs.writeFile(path, '', (err) => {
+							if (err)
+								new Notice('Error creating file:', err);
+							else
+								new Notice('File created successfully.');
+						});
+					}
+					else if (!adapter.fs.existsSync(path) && !value)
 						return
 
 					if (!value)

@@ -1,5 +1,6 @@
 import initSqlJs, { BindParams, Database } from 'sql.js'
 import ManagerPlugin from '../main'
+import {init} from './init'
 import { App } from 'obsidian'
 import * as methods from './methods'
 
@@ -27,6 +28,8 @@ export class ManagerDatabase {
 		try {
 			const db = await this.app.vault.adapter.readBinary(this.plugin.settings.databasePath)
 			this.db = new SQL.Database(Buffer.from(db))
+			init(this.db)
+			this.save()
 			this.db.run("PRAGMA foreign_keys = ON;");
 		} catch (e) {
 			const error = new Error(e)
