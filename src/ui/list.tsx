@@ -81,11 +81,22 @@ export const List = () => {
     }
 
 	const handleContextMenu = (event: BaseSyntheticEvent, transaction: any) => {
+		let mouseX: number = event.clientX - 45;
+		let mouseY: number = event.clientY - 45;
+
+		const leaf = db.app.workspace.getLeavesOfType('file-explorer')[0];
+		if (!leaf.parent.parent.collapsed) {
+			const navEl = leaf.view.containerEl.querySelector('.nav-files-container');
+			const rect = navEl.getBoundingClientRect();
+			mouseX -= rect.width
+		}
+
 		event.preventDefault();
+
 		if (!contextMenu.clicked) {
 			const newContext = {
-				mouseX: event.clientX - 345,
-				mouseY: event.clientY - 60,
+				mouseX: mouseX,
+				mouseY: mouseY,
 				transaction: transaction,
 				clicked: true,
 			}
@@ -226,7 +237,7 @@ export const List = () => {
 								checked={checkedItems[t.transaction.id] || false}
 								onChange={handleSelect}/>
 						</td> : ""}
-						<th className="cell" scope="row">{t.transaction.date}</th>
+						<th className="fixed-width" scope="row">{t.transaction.date}</th>
 
 						{t.from_account ? <td className="fixed-width" style={colorAccount(t.transaction, 0)}>{t.from_account.title}</td> : 
 							<td className="fixed-width"></td>}
@@ -252,7 +263,7 @@ export const List = () => {
 									" " + t.to_account.currency}
 							</td> : <td className="cell"></td>}
 
-						<td className="cell">{t.transaction.description}</td>
+						<td className="fixed-width">{t.transaction.description}</td>
 					</tr>
 				)
 			})}
@@ -277,9 +288,8 @@ export const List = () => {
 				<ul 
 				  className="context-menu" 
 				  style={{
-					position: 'fixed',
-					left: contextMenu.mouseX + 'px',
-					top: contextMenu.mouseY + 'px'
+					left: contextMenu.mouseX,
+					top: contextMenu.mouseY,
 				  }}
 				>
 				  <li onClick={() => handleEditTransaction(contextMenu.transaction)}>Edit Transaction</li>
