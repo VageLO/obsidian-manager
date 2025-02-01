@@ -13,7 +13,7 @@ export const Dashboard = () => {
 		plugins: {
 			title: {
 				display: true,
-				align: 'center',
+				align: 'center' as "start" | "end" | "center" | undefined,
 				color: '#ffffff',
 				font: {
 					size: 16,
@@ -24,15 +24,15 @@ export const Dashboard = () => {
                 }
 			},
 			legend: {
-				position: 'right',
-				align: 'center',
+				position: 'right' as "bottom" | "right" | "left" | "top" | "center" | "chartArea",
+				align: 'center' as 'center' | 'start' | 'end' | undefined,
 				labels: {
 					boxWidth: 20,
 					padding: 10,
-					generateLabels(chart) {
+					generateLabels(chart: any) {
 						const data = chart.data;
 						if (data.labels.length && data.datasets.length) {
-							return data.labels.map((label, i) => {
+							return data.labels.map((label: any, i: any) => {
 								const dataset = data.datasets[0];
 								const fillStyle = dataset.backgroundColor[i];
 								const strokeStyle = dataset.borderColor ? dataset.borderColor[i] : '#ffffff';
@@ -51,7 +51,7 @@ export const Dashboard = () => {
 						return []
 					}
 				},
-				onClick: (e, legendItem, legend) => {
+				onClick: (_: any, legendItem: any, legend: any) => {
 					const index = legendItem.index;
 					const ci = legend.chart;
 					const meta = ci.getDatasetMeta(0);
@@ -83,7 +83,7 @@ export const Dashboard = () => {
 		let labels: string[] = []
 
 		accounts
-			.sort((a, b) => b.balance - a.balance)
+			.sort((a: any, b: any) => b.balance - a.balance)
 			.forEach((acc: any) => {
 				labels.push(acc.title)
 				data.push(acc.balance)
@@ -102,7 +102,7 @@ export const Dashboard = () => {
 	}
 
 	const count = () => {
-		return transactions.reduce((acc, t) => {
+		return transactions.reduce((acc: any, t: any) => {
 			const { transaction, category } = t
 			const title = category.title;
 			const amount = Number.parseFloat(transaction.amount);
@@ -130,12 +130,12 @@ export const Dashboard = () => {
 		let color_count: number = 0
 
 		Object.entries(income_expense)
-			.filter(([_, value]) => value[type])
-			.sort((a, b) => {
+			.filter(([_, value]: [any, any]) => value[type])
+			.sort((a: any, b: any) => {
 				const comparison = a[1][type] - b[1][type]
 				return sortedOrder === 'asc' ? comparison : -comparison
 			})
-			.forEach(([key, value]) => {
+			.forEach(([key, value]: [any, any]) => {
 				labels.push(key)
 				data.push(value[type])
 				color_count += 1
@@ -156,6 +156,7 @@ export const Dashboard = () => {
 
     return (
 		<div>
+			<hr/>
 			<Header/>
 			<div className='canvas-container'>
 				<div className='canvas-item'>

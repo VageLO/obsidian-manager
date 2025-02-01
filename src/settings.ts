@@ -26,7 +26,7 @@ export class ManagerSettingTab extends PluginSettingTab {
     
     display (): void {
         const { containerEl, plugin, app } = this
-        const { adapter } = app.vault
+        const { adapter }: any = app.vault
         
         containerEl.empty()
 
@@ -39,7 +39,7 @@ export class ManagerSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					value = value.trim()
 
-					const localdb_toggle = localdb.components[1]
+					const localdb_toggle: any = localdb.components[1]
 					localdb_toggle.setValue(false)
 
 					plugin.settings.databasePath = value;
@@ -55,14 +55,14 @@ export class ManagerSettingTab extends PluginSettingTab {
                     {delay: 1, placement: 'left'})
 				.setDisabled(plugin.settings.api)
 		    	.onChange(async(value) => {
-					const apidb_toggle = apidb.components[1]
+					const apidb_toggle: any = apidb.components[1]
 					if (apidb_toggle.on)
 						return
 
 					const path = adapter.path.join(adapter.basePath, plugin.settings.databasePath)
 					if (adapter.path.extname(path) == '.db' && 
 						!adapter.fs.existsSync(path) && value) {
-						adapter.fs.writeFile(path, '', (err) => {
+						adapter.fs.writeFile(path, '', (err: any) => {
 							if (err)
 								new Notice('Error creating file:', err);
 							else
@@ -102,7 +102,7 @@ export class ManagerSettingTab extends PluginSettingTab {
 					if (value == '')
 						return
 
-					const apidb_toggle = apidb.components[1]
+					const apidb_toggle: any = apidb.components[1]
 					apidb_toggle.setValue(false)
 
 					plugin.settings.apiProject = value;
@@ -118,7 +118,7 @@ export class ManagerSettingTab extends PluginSettingTab {
                     {delay: 1, placement: 'left'})
 				.setDisabled(plugin.settings.local)
 		    	.onChange(async(value) => {
-					const localdb_toggle = localdb.components[1]
+					const localdb_toggle: any = localdb.components[1]
 					const { apiProject } = plugin.settings
 
 					if (localdb_toggle.on)
@@ -127,7 +127,7 @@ export class ManagerSettingTab extends PluginSettingTab {
 					const isNotDbFile = adapter.path.extname(apiProject) != '.db'
 					if (isNotDbFile && value) {
 						new Notice(`${apiProject} isn't database file`)
-						const apidb_toggle = localdb.components[1]
+						const apidb_toggle: any = localdb.components[1]
 						apidb_toggle.setValue(false)
 						return
 					} else if (isNotDbFile && !value)

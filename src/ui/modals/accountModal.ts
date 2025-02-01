@@ -1,7 +1,6 @@
 import { Setting, Notice } from 'obsidian';
-import { isString } from 'util';
-import { ManagerAPIDatabase } from '../../api';
 import { EditModal, isEmpty } from './modal';
+import { isString } from 'util';
 
 export async function accountModal(this: EditModal) {
 
@@ -28,10 +27,11 @@ export async function accountModal(this: EditModal) {
 			})
 			d
 				.setValue('')
-				.onChange((value) => {
-					title.components[0].setValue(accounts[value].title)
-					currency.components[0].setValue(accounts[value].currency)
-					balance.components[0].setValue(accounts[value].balance.toString())
+				.onChange((v) => {
+					const value: number = Number(v);
+					(title.components[0] as any).setValue(accounts[value].title)
+					(currency.components[0] as any).setValue(accounts[value].currency)
+					(balance.components[0] as any).setValue(accounts[value].balance.toString())
 					account.id = accounts[value].id; 
 					account.title = accounts[value].title; 
 					account.currency = accounts[value].currency; 
@@ -43,7 +43,7 @@ export async function accountModal(this: EditModal) {
 				.setButtonText("Delete")
 				.onClick(async() => {
 					this.data = {
-						delete: await this.database.deleteAccount(account.id)
+						delete: await this.database.deleteAccount(account.id as number)
 					}
 					this.close()
 				})
@@ -85,12 +85,13 @@ export async function accountModal(this: EditModal) {
 			text
                 .setValue(account.balance.toString())
 				.onChange((value) => {
-					const balance = Number.parseFloat(value).toFixed(2)
+					const fixed_balance: string = Number.parseFloat(value).toFixed(2)
+					const balance: number = Number(fixed_balance)	
 					if (isNaN(balance)) {
 						new Notice("Please specify valid number")
 						return
 					}
-					account.balance = +balance; 
+					account.balance = balance; 
 				})
 		})
 
@@ -102,9 +103,9 @@ export async function accountModal(this: EditModal) {
 			.onClick(async() => {
 				let res
 				const fields = {
-					title: title.components[0].inputEl,
-					currency: currency.components[0].inputEl,
-					balance: balance.components[0].inputEl,
+					title: (title.components[0] as any)?.inputEl,
+					currency: (currency.components[0] as any)?.inputEl,
+					balance: (balance.components[0] as any)?.inputEl,
 				}
 				if (account.id) {
 					res = await this.database.updateAccount(account)

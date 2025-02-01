@@ -1,17 +1,16 @@
 import { DEFAULT_SETTINGS, ManagerSettings, ManagerSettingTab} from './settings'
-import { ribbon, saveIcon } from './icons'
+import { ribbon } from './icons'
 import { ManagerView, VIEW_TYPE } from './ui/view';
 import { Plugin, WorkspaceLeaf, addIcon, Notice } from 'obsidian'
 import { ManagerDatabase } from './database'
 import { ManagerAPIDatabase } from './api'
-import { BindParams } from 'sql.js'
 
 export default class ManagerPlugin extends Plugin {
     plugin: Plugin
     settings: ManagerSettings
-    database: ManagerDatabase
+    database: ManagerDatabase | ManagerAPIDatabase
     
-    async onload () {
+    async onload() {
         await this.loadSettings()
         this.addSettingTab(new ManagerSettingTab(this.app, this));
 
@@ -64,18 +63,14 @@ export default class ManagerPlugin extends Plugin {
         return await this.database.initDatabase()
     }
 
-    async loadSettings () {
+    async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
     }
     
-    async saveSettings () {
+    async saveSettings() {
         await this.saveData(this.settings)
     }
     
-    async query (sql: string, params?: BindParams) {
-        return this.database.query(sql, params)
-    }
-
     async activateView() {
         const { workspace } = this.app;
 
@@ -83,8 +78,9 @@ export default class ManagerPlugin extends Plugin {
         const leaves = workspace.getLeavesOfType(VIEW_TYPE);
 
         if (leaves.length > 0) {
-            leaf = leaves[0];
-            leaf.rebuildView();
+			const rebuild: any = leaves[0]
+            rebuild.rebuildView();
+            leaf = leaves[0]
         } else {
             leaf = workspace.getLeaf(false);
             await leaf.setViewState({ type: VIEW_TYPE, active: true });
@@ -92,4 +88,15 @@ export default class ManagerPlugin extends Plugin {
 
         workspace.revealLeaf(leaf);
     }
+
+	// TODO: Commands
+	registerCommands() {
+		this.addCommand({
+			id: "add-transaction",
+			name: "Add transaction",
+			callback: () => {
+
+			},
+		});
+	}
 }

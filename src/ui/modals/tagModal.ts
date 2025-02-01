@@ -1,5 +1,4 @@
 import { Setting, Notice } from 'obsidian';
-import { ManagerAPIDatabase } from '../../api';
 import { EditModal, isEmpty } from './modal';
 import { isString } from 'util';
 
@@ -24,8 +23,9 @@ export async function tagModal(this: EditModal) {
 			})
 			d
 				.setValue('')
-				.onChange((value) => {
-					title.components[0].setValue(tags[value].title)
+				.onChange((value: any) => {
+					const component: any = title.components[0]
+					component.setValue(tags[value].title)
 					tag.id = tags[value].id; 
 					tag.title = tags[value].title; 
 				})
@@ -34,6 +34,9 @@ export async function tagModal(this: EditModal) {
 			button
 				.setButtonText("Delete")
 				.onClick(async() => {
+					if (!tag.id)
+						return
+
 					this.data = {
 						delete: await this.database.deleteTag(tag.id)
 					}
@@ -63,7 +66,7 @@ export async function tagModal(this: EditModal) {
 			.onClick(async() => {
 				let res
 				const fields = {
-					title: title.components[0].inputEl,
+					title: (title.components[0] as any)?.inputEl,
 				}
 
 				if (tag.id) {

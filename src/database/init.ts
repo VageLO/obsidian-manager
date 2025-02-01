@@ -1,4 +1,4 @@
-export const init = (db) => {
+export const init = (db: any) => {
 	// Tables
 	db.run(accounts_table)
 	db.run(categories_table)

@@ -14,7 +14,7 @@ export function pluginFile (this: ManagerDatabase, filename: string, absolute = 
         thisPluginId,
         filename
     ]
-    if (absolute) path.unshift(this.app.vault.adapter.basePath)
+    if (absolute) path.unshift((this.app.vault.adapter as any)?.basePath)
         return path.join('/')
 }
 

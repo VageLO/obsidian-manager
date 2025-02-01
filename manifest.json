@@ -1,11 +1,11 @@
 {
 	"id": "obsidian-manager",
 	"name": "Money manager Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
+	"version": "0.1.0",
+	"minAppVersion": "0.16.0",
+	"description": "Money manager inside obsidian",
+	"author": "VageLO",
+	"authorUrl": "https://github.com/VageLO",
+	"fundingUrl": "https://github.com/VageLO",
+	"isDesktopOnly": true
 }

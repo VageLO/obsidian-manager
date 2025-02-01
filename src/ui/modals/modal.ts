@@ -10,14 +10,14 @@ export function isEmpty(value: string) {
 
 export class EditModal extends Modal {
 	app: App
-	database: ManagerDatabase | ManagerAPIDatabase
+	database: ManagerDatabase & ManagerAPIDatabase
 	callback: (arg: any) => void
 	onCloseCallback: (transaction: any) => void
 	data: any
 
 	constructor(
 		app: App,
-		database: ManagerDatabase | ManagerAPIDatabase,
+		database: ManagerDatabase & ManagerAPIDatabase,
 		callback: (arg: any) => void,
         onCloseCallback: (transaction: any) => void,
 	) {
@@ -42,7 +42,7 @@ export class EditModal extends Modal {
 			})
 		})
 
-		for (const [key, value] of Object.entries(fields)) {
+		for (const [key, value] of Object.entries(fields as Record<string, HTMLElement>)) {
 			if (!map.has(key) && value.classList.contains('invalid-input'))
 				value.classList.remove('invalid-input')
 			else if (map.has(key))
@@ -50,7 +50,7 @@ export class EditModal extends Modal {
 		}
 	}
 
-	async load(arg: any) {
+	async load(arg?: any) {
 		this.callback(arg)
 	}
 

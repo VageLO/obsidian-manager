@@ -39,7 +39,7 @@ export const List = () => {
     const { transactions, setTransactions, db } = useResourcesContext()
 	const { app, plugin } = db
 
-    const [checkedItems, setCheckedItems] = useState({})
+    const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({})
     const [grandTotal, setGrandTotal] = useState({
 		type: 'Total',
 		total: '',
@@ -80,7 +80,7 @@ export const List = () => {
         setTransactions(t)
     }
 
-	const handleContextMenu = (event: BaseSyntheticEvent, transaction: any) => {
+	const handleContextMenu = (event: any, transaction: any) => {
 		let mouseX: number = event.clientX - 45;
 		let mouseY: number = event.clientY - 45;
 
@@ -141,7 +141,7 @@ export const List = () => {
 	const handleSelectAll = (event: BaseSyntheticEvent) => {
 		const { checked } = event.target
 		setSelectAll(checked)
-		const updatedCheckedItems = transactions.reduce((acc, item) => {
+		const updatedCheckedItems = transactions.reduce((acc: any, item: any) => {
 			acc[item.transaction.id] = checked;
 			return acc;
 		}, {})
@@ -150,7 +150,7 @@ export const List = () => {
 
 	const countTotal = (type: string) => {
 		let res = `${type}: `
-		const count = transactions.reduce((acc, t) => {
+		const count = transactions.reduce((acc: any, t: any) => {
 			const { transaction, from_account } = t
 			const currency = from_account.currency;
 			const amount = Number.parseFloat(transaction.amount);
@@ -234,7 +234,7 @@ export const List = () => {
 							<input
                         	    type="checkbox"
                         	    name={t.transaction.id}
-								checked={checkedItems[t.transaction.id] || false}
+								checked={checkedItems[t.transaction.id] ?? false}
 								onChange={handleSelect}/>
 						</td> : ""}
 						<th className="fixed-width" scope="row">{t.transaction.date}</th>
@@ -294,8 +294,8 @@ export const List = () => {
 				>
 				  <li onClick={() => handleEditTransaction(contextMenu.transaction)}>Edit Transaction</li>
 				  <li onClick={async() => {
-					await db.deleteTransactions([contextMenu.transaction.id])
-					removeFromState(contextMenu.transaction.id)}}>Delete Transaction</li>
+					await db.deleteTransactions([(contextMenu.transaction as any).id])
+					removeFromState((contextMenu.transaction as any).id)}}>Delete Transaction</li>
 				</ul>}
 		</div>
 	);

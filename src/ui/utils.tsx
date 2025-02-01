@@ -43,7 +43,7 @@ export const Utils = () => {
 
 		setTransactions((prev: any) => {
 			let newTransactions = [...prev, data]
-			newTransactions.sort((a: any, b: any) => new Date(b.transaction.date) - new Date(a.transaction.date))
+			newTransactions.sort((a: any, b: any) => new Date(b.transaction.date).getTime() - new Date(a.transaction.date).getTime())
 			return newTransactions 
 		})
 	}

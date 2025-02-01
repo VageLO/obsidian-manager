@@ -44,10 +44,6 @@ export class ManagerDatabase {
 			msg: str_error,
 		}]
 	}
-
-	async query (sql: string, params?: BindParams) {
-		return this.db.exec(sql, params)
-	}
 }
 
 Object.entries(methods).forEach(([name, method]) => {

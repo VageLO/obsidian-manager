@@ -1,4 +1,3 @@
-import { ManagerAPIDatabase } from '../../api';
 import { Setting, Notice } from 'obsidian';
 import { EditModal, isEmpty } from './modal';
 import { isString } from 'util';
@@ -26,11 +25,12 @@ export async function categoryModal(this: EditModal) {
 			})
 			d
 				.setValue('')
-				.onChange((value) => {
-					title.components[0].setValue(categories[value].title)
-					parent.components[0].setValue(categories[value].parent_id)
+				.onChange((v: string) => {
+					const value: number = Number(v);
+					(title.components[0] as any).setValue(categories[value].title)
+					(parent.components[0] as any).setValue(categories[value].parent_id)
 					category.id = categories[value].id; 
-					category.parent_id= categories[value].parent_id; 
+					category.parent_id = categories[value].parent_id; 
 					category.title = categories[value].title; 
 				})
 		})
@@ -39,7 +39,7 @@ export async function categoryModal(this: EditModal) {
 				.setButtonText("Delete")
 				.onClick(async() => {
 					this.data = {
-						delete: await this.database.deleteCategory(category.id)
+						delete: await this.database.deleteCategory(category.id as number)
 					}
 					this.close()
 				})
@@ -81,7 +81,7 @@ export async function categoryModal(this: EditModal) {
 			.onClick(async() => {
 				let res
 				const fields = {
-					title: title.components[0].inputEl,
+					title: (title.components[0] as any)?.inputEl,
 				}
 				if (category.id) {
 					res = await this.database.updateCategory(category)

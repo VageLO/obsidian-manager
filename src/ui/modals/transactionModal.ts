@@ -1,5 +1,4 @@
-import { Setting, Notice, BaseComponent } from 'obsidian';
-import { ManagerDatabase } from '../../database';
+import { Setting, Notice } from 'obsidian';
 import { EditModal } from './modal';
 
 function parseAmount(amount: string) {
@@ -67,7 +66,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 	    .setName("Amount")
 	    .addText((text) => {
 	    	text
-	    		.setValue(transaction.amount.toString())
+	    		.setValue(transaction?.amount?.toString() ?? '')
 	    		.onChange((value) => {
 					const amount = parseAmount(value)
 					if (isNaN(amount)) {
@@ -120,7 +119,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 				d.addOption(account.id, account.title)
 			})
 			d
-				.setValue(transaction.account_id)
+				.setValue(transaction?.account_id?.toString() ?? '')
 				.onChange((v) => {
 					const value = +v
 					if (value == transaction.to_account_id)
@@ -157,16 +156,16 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 			.setValue(false)
             .setTooltip("Enable transfer to account", {delay: 1, placement: 'left'})
 			.onChange((value) => {
-				let to_amountField : BaseComponent
-				let to_accountDropdown: BaseComponent
+				let to_amountField : any 
+				let to_accountDropdown: any
 
-				amount.components.forEach((component: BaseComponent) => {
+				amount.components.forEach((component: any) => {
 					if (!component.inputEl)
 						return
 					else if (component.inputEl.dataset.key == "to_amount")
 						to_amountField = component
 				})
-                to_account.components.forEach((component: BaseComponent) => {
+                to_account.components.forEach((component: any) => {
 					if (!component.selectEl)
 						return 
 					else if (component.selectEl.dataset.key == "to_account")
@@ -179,7 +178,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 				    to_accountDropdown.setDisabled(false)
 
                     // Set transaction to type 'Transfer' and disable dropdown
-					const typeDropdown = type.components[0]
+					const typeDropdown: any = type.components[0]
 				    typeDropdown.setDisabled(true)
                     typeDropdown.setValue("Transfer")
                     transaction.transaction_type = typeDropdown.getValue() 
@@ -194,7 +193,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 				    to_amountField.setValue("")
 
                     // Set transaction type to 'Withdrawal' or back to already existed type and enable dropdown
-				    const typeDropdown = type.components[0]
+				    const typeDropdown: any = type.components[0]
 				    typeDropdown.setDisabled(false)
                     typeDropdown.setValue(selected_transaction ? selected_transaction.transaction_type : "Withdrawal")
                     transaction.transaction_type = typeDropdown.getValue() 
@@ -211,7 +210,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 				d.addOption(category.id, category.title)
 			})
 			d
-				.setValue(transaction.category_id)
+				.setValue(transaction?.category_id?.toString() ?? '')
 				.onChange((value) => {
 					transaction.category_id = +value;
 				})
@@ -225,7 +224,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 				d.addOption(tag.id, tag.title)
 			})
 			d
-				.setValue(transaction.tag_id)
+				.setValue(transaction?.tag_id?.toString() ?? '')
 				.onChange((value) => {
 					transaction.tag_id = +value;
 				})
@@ -250,14 +249,14 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 			.onClick(async() => {
 				let res
 				const fields = {
-					account_id: from_account.components[0].selectEl,
-					category_id: category.components[0].selectEl,
-					to_account_id: to_account.components[0].selectEl,
-					transaction_type: type.components[0].selectEl,
-					amount: amount.components[0].inputEl,
-					to_amount: amount.components[1].inputEl,
-					date: date.components[0].inputEl,
-					description: description?.components[0]?.inputEl,
+					account_id: (from_account.components[0] as any)?.selectEl,
+					category_id: (category.components[0] as any)?.selectEl,
+					to_account_id: (to_account.components[0] as any)?.selectEl,
+					transaction_type: (type.components[0] as any)?.selectEl,
+					amount: (amount.components[0] as any)?.inputEl,
+					to_amount: (amount.components[1] as any)?.inputEl,
+					date: (date.components[0] as any)?.inputEl,
+					description: (description.components[0] as any)?.inputEl,
 				}
 
                 if (selected_transaction) {
