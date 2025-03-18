@@ -64,6 +64,6 @@ export async function deleteCategory(this: ManagerDatabase, id: number) {
 		await this.save()
 		return id
 	} catch {
-		return
+		return 0
 	}
 }

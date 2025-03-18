@@ -1,14 +1,10 @@
 import { Setting, Notice } from 'obsidian';
 import { EditModal, isEmpty } from './modal';
 import { isString } from 'util';
+import { Tag } from 'types';
 
 export async function tagModal(this: EditModal) {
 	const tags = await this.database.listTags();
-
-	interface Tag {
-		id: number | null;
-		title: string | null;
-	}
 
 	const tag: Tag = {
 		id: null,

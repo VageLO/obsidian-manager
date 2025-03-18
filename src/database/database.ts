@@ -1,10 +1,11 @@
-import initSqlJs, { BindParams, Database } from 'sql.js'
+import initSqlJs, { Database } from 'sql.js'
 import ManagerPlugin from '../main'
 import {init} from './init'
 import { App } from 'obsidian'
 import * as methods from './methods'
+import { DatabaseInterface } from 'types'
 
-export class ManagerDatabase {
+export class ManagerDatabase implements DatabaseInterface {
     plugin: ManagerPlugin
     app: App
     db: Database
@@ -14,7 +15,7 @@ export class ManagerDatabase {
 		this.app = plugin.app
 	}
   
-	async initDatabase () {
+	async initialize(): Promise<void | Error> {
 		const SQL = await initSqlJs({
 			locateFile: _file => this.pluginFile('sql-wasm.wasm', true),
 		})
@@ -47,11 +48,10 @@ export class ManagerDatabase {
 }
 
 Object.entries(methods).forEach(([name, method]) => {
-    ManagerDatabase.prototype[name] = method 
+    (ManagerDatabase.prototype as any)[name] = method 
 })
 
 type Methods = typeof methods;
 declare module './database' {
-    interface ManagerDatabase extends Methods{
-    }
+    interface ManagerDatabase extends Methods{}
 }

@@ -59,11 +59,15 @@ export async function listTransactions(
     return transactions
 }
 
-export async function deleteTransactions(this: ManagerDatabase, ids: number[]) {
+export async function deleteTransactions(
+	this: ManagerDatabase,
+	ids: number[]
+): Promise<boolean> {
     ids.forEach(async(id) => {
         this.db.run(`DELETE FROM Transactions WHERE id = ?`, [id])
         await this.save()
     })
+	return true
 }
 
 export async function insertTransaction(this: ManagerDatabase, t: any) {

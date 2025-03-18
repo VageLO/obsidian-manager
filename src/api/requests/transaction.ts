@@ -1,4 +1,5 @@
 import { Notice, requestUrl, RequestUrlParam } from 'obsidian';
+import { CustomError, Transaction, TransactionDetails } from 'types';
 import { ManagerAPIDatabase } from '../database'
 
 export async function listTransactions(
@@ -9,7 +10,7 @@ export async function listTransactions(
 	month?: string,
 	year?: number,
 	state?: any,
-) {
+): Promise<TransactionDetails[]> {
 
 	let conditions: string[] = []
 	const query = "/transaction/list" 
@@ -53,7 +54,10 @@ export async function listTransactions(
 	return res.json
 }
 
-export async function insertTransaction(this: ManagerAPIDatabase, transaction: any) {
+export async function insertTransaction(
+	this: ManagerAPIDatabase,
+	transaction: Transaction
+): Promise<TransactionDetails | CustomError> {
 	const url = `${this.apiURL}/transaction/create`
 	const request: RequestUrlParam = {
 	    url: url,
@@ -73,7 +77,10 @@ export async function insertTransaction(this: ManagerAPIDatabase, transaction: a
 	return {error: true, detail: res.json.detail}
 }
 
-export async function updateTransaction(this: ManagerAPIDatabase, transaction: any) {
+export async function updateTransaction(
+	this: ManagerAPIDatabase,
+	transaction: Transaction
+): Promise<TransactionDetails | CustomError> {
 	const url = `${this.apiURL}/transaction/update`
 	const request: RequestUrlParam = {
 	    url: url,
@@ -92,7 +99,10 @@ export async function updateTransaction(this: ManagerAPIDatabase, transaction: a
 	return {error: true, detail: res.json.detail}
 }
 
-export async function deleteTransactions(this: ManagerAPIDatabase, ids: number[]) {
+export async function deleteTransactions(
+	this: ManagerAPIDatabase,
+	ids: number[]
+): Promise<boolean> {
 	const query = "/transaction/delete"
 	const url = `${this.apiURL}${query}`
 	const request: RequestUrlParam = {

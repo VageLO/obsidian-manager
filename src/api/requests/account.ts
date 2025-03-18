@@ -1,7 +1,8 @@
 import { requestUrl, Notice, RequestUrlParam  } from 'obsidian';
+import { Account, CustomError } from 'types';
 import { ManagerAPIDatabase } from '../database'
 
-export async function listAccounts(this: ManagerAPIDatabase) {
+export async function listAccounts(this: ManagerAPIDatabase): Promise<Account[]> {
 	const query = "/account/list"
     const request: RequestUrlParam = {
         url: `${this.apiURL}${query}`,
@@ -17,7 +18,10 @@ export async function listAccounts(this: ManagerAPIDatabase) {
     return res.json
 }
 
-export async function updateAccount(this: ManagerAPIDatabase, account: any) {
+export async function updateAccount(
+	this: ManagerAPIDatabase,
+	account: Account
+): Promise<Account | CustomError> {
     const request: RequestUrlParam = {
         url: `${this.apiURL}/account/update`,
         method: "POST",
@@ -35,7 +39,10 @@ export async function updateAccount(this: ManagerAPIDatabase, account: any) {
 	return {error: true, detail: res.json.detail}
 }
 
-export async function createAccount(this: ManagerAPIDatabase, account: any) {
+export async function createAccount(
+	this: ManagerAPIDatabase,
+	account: Account
+): Promise<Account | CustomError> {
     const request: RequestUrlParam = {
         url: `${this.apiURL}/account/create`,
         method: "POST",
@@ -54,7 +61,10 @@ export async function createAccount(this: ManagerAPIDatabase, account: any) {
 	return {error: true, detail: res.json.detail}
 }
 
-export async function deleteAccount(this: ManagerAPIDatabase, id: number) {
+export async function deleteAccount(
+	this: ManagerAPIDatabase,
+	id: number
+): Promise<number> {
 	const query = "/account/delete"
     const request: RequestUrlParam = {
         url: `${this.apiURL}${query}?id=${id}`,

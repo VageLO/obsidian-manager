@@ -1,4 +1,5 @@
 import { Setting, Notice } from 'obsidian';
+import { Transaction, CustomError, TransactionDetails } from 'types';
 import { EditModal } from './modal';
 
 function parseAmount(amount: string) {
@@ -7,22 +8,13 @@ function parseAmount(amount: string) {
 	else return num
 }
 
-export async function transactionModal(this: EditModal, selected_transaction: any) {
+export async function transactionModal(
+	this: EditModal,
+	selected_transaction: Transaction
+) {
 	const accounts = await this.database.listAccounts();
 	const categories = await this.database.listCategories();
 	const tags = await this.database.listTags();
-
-	interface Transaction {
-		account_id: number | null;
-		category_id: number | null;
-		to_account_id: number | null;
-		tag_id: number | null;
-		amount: number | null;
-		to_amount: number | null;
-		transaction_type: string;
-		date: string;
-		description: string;
-	}
 
 	let transaction: Transaction = {
 		account_id: null,
@@ -247,7 +239,7 @@ export async function transactionModal(this: EditModal, selected_transaction: an
 			.setButtonText('💾')
 			.setCta()
 			.onClick(async() => {
-				let res
+				let res : TransactionDetails | CustomError
 				const fields = {
 					account_id: (from_account.components[0] as any)?.selectEl,
 					category_id: (category.components[0] as any)?.selectEl,

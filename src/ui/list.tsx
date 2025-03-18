@@ -121,7 +121,7 @@ export const List = () => {
 
 		for (const [key, value] of Object.entries(checkedItems)) {
 			if (value)
-				ids.push(key)
+				ids.push(Number(key))
 		}
 
 		if (ids.length) {

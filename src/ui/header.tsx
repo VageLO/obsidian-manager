@@ -14,12 +14,13 @@ export const Header = () => {
 		db
 	} = useResourcesContext()
 
+	console.log(categories)
 	useEffect(() => {
 		const fetchData = async(
 			account: any,
 			category: any,
 			tag: any,
-			month: string,
+			month: string | null,
 			year: any,
 		) => {
 			setTransactions(await db.listTransactions(account, category, tag, month, year, setPrevFilter))

@@ -1,6 +1,5 @@
 import { App, Modal, Notice } from 'obsidian';
-import { ManagerDatabase } from '../../database';
-import { ManagerAPIDatabase } from '../../api';
+import { DatabaseInterface } from 'types';
 
 export function isEmpty(value: string) { 
 	value = value.trim()
@@ -10,14 +9,14 @@ export function isEmpty(value: string) {
 
 export class EditModal extends Modal {
 	app: App
-	database: ManagerDatabase & ManagerAPIDatabase
+	database: DatabaseInterface
 	callback: (arg: any) => void
 	onCloseCallback: (transaction: any) => void
 	data: any
 
 	constructor(
 		app: App,
-		database: ManagerDatabase & ManagerAPIDatabase,
+		database: DatabaseInterface,
 		callback: (arg: any) => void,
         onCloseCallback: (transaction: any) => void,
 	) {

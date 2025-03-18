@@ -1,7 +1,10 @@
 import { requestUrl, Notice, RequestUrlParam  } from 'obsidian';
+import { CustomError, Tag } from 'types';
 import { ManagerAPIDatabase } from '../database'
 
-export async function listTags(this: ManagerAPIDatabase) {
+export async function listTags(
+	this: ManagerAPIDatabase
+): Promise<Tag[]> {
 	const query = "/tag/list"
     const request: RequestUrlParam = {
         url: `${this.apiURL}${query}`,
@@ -16,7 +19,10 @@ export async function listTags(this: ManagerAPIDatabase) {
     return res.json
 }
 
-export async function updateTag(this: ManagerAPIDatabase, tag: any) {
+export async function updateTag(
+	this: ManagerAPIDatabase,
+	tag: Tag
+): Promise<Tag | CustomError> {
     const request: RequestUrlParam = {
         url: `${this.apiURL}/tag/update`,
         method: "POST",
@@ -35,7 +41,10 @@ export async function updateTag(this: ManagerAPIDatabase, tag: any) {
 	return {error: true, detail: res.json.detail}
 }
 
-export async function createTag(this: ManagerAPIDatabase, tag: any) {
+export async function createTag(
+	this: ManagerAPIDatabase,
+	tag: Tag
+): Promise<Tag | CustomError> {
     const request: RequestUrlParam = {
         url: `${this.apiURL}/tag/create`,
         method: "POST",
@@ -54,7 +63,10 @@ export async function createTag(this: ManagerAPIDatabase, tag: any) {
 	return {error: true, detail: res.json.detail}
 }
 
-export async function deleteTag(this: ManagerAPIDatabase, id: number) {
+export async function deleteTag(
+	this: ManagerAPIDatabase,
+	id: number
+): Promise<number> {
 	const query = "/tag/delete"
     const request: RequestUrlParam = {
         url: `${this.apiURL}${query}?id=${id}`,

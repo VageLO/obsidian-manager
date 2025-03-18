@@ -4,16 +4,17 @@ import { Tabs } from './tabs';
 import { ResourceProvider } from './resourcesProvider';
 import { ManagerDatabase } from 'database';
 import { ManagerAPIDatabase } from 'api';
+import { DatabaseInterface } from 'types';
 
 export const VIEW_TYPE = 'manager-view';
 
 export class ManagerView extends ItemView {
 	root: Root | null = null;
-	db: ManagerDatabase | ManagerAPIDatabase
+	db: DatabaseInterface;
 
 	constructor(
 		leaf: WorkspaceLeaf, 
-		db: ManagerAPIDatabase | ManagerDatabase
+		db: DatabaseInterface
 	) {
 		super(leaf);
         this.db = db

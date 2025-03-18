@@ -66,6 +66,6 @@ export async function deleteAccount(this: ManagerDatabase, id: number) {
 		await this.save()
 		return id
 	} catch {
-		return
+		return 0
 	}
 }

@@ -4,11 +4,12 @@ import { ManagerView, VIEW_TYPE } from './ui/view';
 import { Plugin, WorkspaceLeaf, addIcon, Notice } from 'obsidian'
 import { ManagerDatabase } from './database'
 import { ManagerAPIDatabase } from './api'
+import { DatabaseInterface } from 'types';
 
 export default class ManagerPlugin extends Plugin {
     plugin: Plugin
     settings: ManagerSettings
-    database: ManagerDatabase | ManagerAPIDatabase
+    database: DatabaseInterface
     
     async onload() {
         await this.loadSettings()
@@ -19,6 +20,7 @@ export default class ManagerPlugin extends Plugin {
             new Notice(`Error: ${err.message}`)
 		else this.notify()
 
+        await this.loadSettings()
         this.registerView(
             VIEW_TYPE,
             (leaf) => new ManagerView(leaf, this.database)
@@ -52,7 +54,7 @@ export default class ManagerPlugin extends Plugin {
 		}
 		else if (api) {
 			this.database = new ManagerAPIDatabase(this)
-			return await this.database.checkAPI()
+			return await this.database.initialize()
 		}
 		else 
 			return new Error("Specify database in settings")
@@ -60,7 +62,7 @@ export default class ManagerPlugin extends Plugin {
 
     async loadLocalDatabase() {
         this.database = new ManagerDatabase(this)
-        return await this.database.initDatabase()
+        return await this.database.initialize()
     }
 
     async loadSettings() {

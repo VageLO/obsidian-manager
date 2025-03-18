@@ -1,15 +1,10 @@
 import { Setting, Notice } from 'obsidian';
 import { EditModal, isEmpty } from './modal';
 import { isString } from 'util';
+import { Category } from 'types';
 
 export async function categoryModal(this: EditModal) {
 	const categories = await this.database.listCategories();
-
-	interface Category {
-		id: number | null;
-		title: string | null;
-		parent_id: number | null;
-	}
 
 	const category: Category = {
 		id: null,

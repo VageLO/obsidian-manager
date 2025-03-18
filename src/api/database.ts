@@ -1,8 +1,9 @@
-import ManagerPlugin from '../main'
-import { App, RequestUrlParam, Notice, requestUrl } from 'obsidian'
-import * as requests from './requests'
+import ManagerPlugin from '../main';
+import { App, RequestUrlParam, Notice, requestUrl } from 'obsidian';
+import { DatabaseInterface, Methods } from '../types';
+import * as methods from './requests';
 
-export class ManagerAPIDatabase {
+export class ManagerAPIDatabase implements DatabaseInterface {
 	plugin: ManagerPlugin
 	app: App
 	apiURL: string
@@ -15,7 +16,7 @@ export class ManagerAPIDatabase {
 		this.project = plugin.settings.apiProject
 	}
 
-	async checkAPI() {
+	async initialize(): Promise<void | Error> {
 		const url = `${this.apiURL}/docs`
 		const request: RequestUrlParam = {
 			url: url,
@@ -37,12 +38,10 @@ export class ManagerAPIDatabase {
 	}
 }
 
-Object.entries(requests).forEach(([name, method]) => {
-	ManagerAPIDatabase.prototype[name] = method 
+Object.entries(methods).forEach(([name, method]) => {
+	(ManagerAPIDatabase.prototype as any)[name] = method 
 })
 
-type Requests = typeof requests;
 declare module './database' {
-	interface ManagerAPIDatabase extends Requests {
-	}
+	interface ManagerAPIDatabase extends Methods {}
 }

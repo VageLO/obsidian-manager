@@ -1,7 +1,10 @@
 import { requestUrl, RequestUrlParam, Notice } from 'obsidian';
+import { Category, CustomError } from 'types';
 import { ManagerAPIDatabase } from '../database'
 
-export async function listCategories(this: ManagerAPIDatabase) {
+export async function listCategories(
+	this: ManagerAPIDatabase
+): Promise<Category[]> {
 	const query = `/category/list` 
     const request: RequestUrlParam = {
         url: `${this.apiURL}${query}`,
@@ -17,7 +20,10 @@ export async function listCategories(this: ManagerAPIDatabase) {
     return res.json
 }
 
-export async function updateCategory(this: ManagerAPIDatabase, category: any) {
+export async function updateCategory(
+	this: ManagerAPIDatabase,
+	category: Category
+): Promise<Category | CustomError> {
     const request: RequestUrlParam = {
         url: `${this.apiURL}/category/update`,
         method: "POST",
@@ -35,7 +41,10 @@ export async function updateCategory(this: ManagerAPIDatabase, category: any) {
 	return {error: true, detail: res.json.detail}
 }
 
-export async function createCategory(this: ManagerAPIDatabase, category: any) {
+export async function createCategory(
+	this: ManagerAPIDatabase,
+	category: Category
+): Promise<Category | CustomError> {
     const request: RequestUrlParam = {
         url: `${this.apiURL}/category/create`,
         method: "POST",
@@ -53,7 +62,10 @@ export async function createCategory(this: ManagerAPIDatabase, category: any) {
 	return {error: true, detail: res.json.detail}
 }
 
-export async function deleteCategory(this: ManagerAPIDatabase, id: number) {
+export async function deleteCategory(
+	this: ManagerAPIDatabase,
+	id: number
+): Promise<number> {
 	const query = "/category/delete"
     const request: RequestUrlParam = {
         url: `${this.apiURL}${query}?id=${id}`,

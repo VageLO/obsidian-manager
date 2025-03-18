@@ -1,17 +1,12 @@
 import { Setting, Notice } from 'obsidian';
 import { EditModal, isEmpty } from './modal';
 import { isString } from 'util';
+import { Account } from 'types';
 
 export async function accountModal(this: EditModal) {
 
 	const accounts = await this.database.listAccounts()
 
-	interface Account {
-		id: number | null;
-		title: string | null;
-		currency: string | null;
-		balance: number;
-	}
 	const account: Account = {
 		id: null,
 		title: null,

@@ -13,7 +13,6 @@ import {
 	TagIcon,
 } from '../icons';
 
-
 export const Utils = () => {
 
 	const { 
@@ -23,18 +22,18 @@ export const Utils = () => {
 		setTags,
 		filter,
 		db,
-	} = useResourcesContext()
+	} = useResourcesContext();
 	const { app, plugin } = db
 
 	const addTransaction = (data: any) => {
 		const { byAccount, byCategory, byTag, byMonth, byYear } = filter
 		const { transaction } = data
 
-		if (byAccount > 0 && byAccount != transaction.account_id)
+		if (byAccount && byAccount > 0 && byAccount != transaction.account_id)
 			return
-		if (byCategory > 0 && byCategory != transaction.category_id) 
+		if (byCategory && byCategory > 0 && byCategory != transaction.category_id) 
 			return
-		if (byTag > 0 && byTag != transaction.tag_id)
+		if (byTag && byTag > 0 && byTag != transaction.tag_id)
 			return
 		if (byMonth != null && Number(byMonth.split('-')[1]) != new Date(transaction.date).getMonth() + 1)
 			return
