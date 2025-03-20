@@ -80,7 +80,7 @@ export async function categoryModal(this: EditModal) {
 				}
 				if (category.id) {
 					res = await this.database.updateCategory(category)
-					if (res.error) {
+					if ('error' in res) {
 						this.validate(res.detail, fields)
 						return
 					}
@@ -88,7 +88,7 @@ export async function categoryModal(this: EditModal) {
 				}
 				else {
 					res = await this.database.createCategory(category)
-					if (res.error) {
+					if ('error' in res) {
 						this.validate(res.detail, fields)
 						return
 					}

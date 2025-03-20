@@ -253,14 +253,14 @@ export async function transactionModal(
 
                 if (selected_transaction) {
 					res = await this.database.updateTransaction(transaction)
-					if (res.error) {
+					if ('error' in res) {
 						this.validate(res.detail, fields)
 						return
 					}
 					this.data = res
 				} else {
 					res = await this.database.insertTransaction(transaction)
-					if (res.error) {
+					if ('error' in res) {
 						this.validate(res.detail, fields)
 						return
 					}

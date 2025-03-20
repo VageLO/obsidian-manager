@@ -1,6 +1,7 @@
 import { ManagerDatabase } from '..';
 import { allTransactions } from './queries'
 import { createObjFromArray } from './dbHelpers';
+import { CustomError, Transaction, TransactionDetails } from 'types';
 
 export function getMonthStartEnd(YMString: string) {
     const [year, month] = YMString.split('-').map(Number);
@@ -20,7 +21,7 @@ export async function listTransactions(
 	month?: string,
 	year?: number,
 	state?: any,
-) {
+): Promise<TransactionDetails[]> {
 
 	let conditions: string[] = []
 
@@ -70,7 +71,10 @@ export async function deleteTransactions(
 	return true
 }
 
-export async function insertTransaction(this: ManagerDatabase, t: any) {
+export async function insertTransaction(
+	this: ManagerDatabase,
+	transaction: Transaction
+): Promise<TransactionDetails | CustomError> {
     try {
 		this.db.run(`
 		INSERT INTO Transactions (
@@ -84,15 +88,15 @@ export async function insertTransaction(this: ManagerDatabase, t: any) {
 		to_amount,
 		to_account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
 	[
-	    t.account_id,
-	    t.category_id,
-	    t.tag_id,
-	    t.transaction_type,
-	    t.date,
-	    t.amount,
-	    t.description,
-	    t.to_amount,
-	    t.to_account_id
+	    transaction.account_id,
+	    transaction.category_id,
+	    transaction.tag_id,
+	    transaction.transaction_type,
+	    transaction.date,
+	    transaction.amount,
+	    transaction.description,
+	    transaction.to_amount,
+	    transaction.to_account_id
 
 	])} catch (e) {
 		const detail = this.validateError(e.message)
@@ -106,12 +110,15 @@ export async function insertTransaction(this: ManagerDatabase, t: any) {
     if (!res.length)
         return {}
 
-	const transaction = createObjFromArray(res[0])[0]
+	const inserted_transaction = createObjFromArray(res[0])[0]
 
-    return transaction
+    return inserted_transaction
 }
 
-export async function updateTransaction(this: ManagerDatabase, t: any) {
+export async function updateTransaction(
+	this: ManagerDatabase,
+	transaction: Transaction
+): Promise<TransactionDetails | CustomError> {
 
 	this.db.exec(`
 		UPDATE Transactions SET 
@@ -127,25 +134,25 @@ export async function updateTransaction(this: ManagerDatabase, t: any) {
 		WHERE id = ?
 	`,
 	[
-		t.account_id,
-		t.category_id,
-		t.tag_id,
-    	t.transaction_type,
-    	t.date,
-    	t.amount,
-    	t.description,
-    	t.to_account_id,
-    	t.to_amount,
-		t.id,
+		transaction.account_id,
+		transaction.category_id,
+		transaction.tag_id,
+    	transaction.transaction_type,
+    	transaction.date,
+    	transaction.amount,
+    	transaction.description,
+    	transaction.to_account_id,
+    	transaction.to_amount,
+		transaction.id ?? 0,
 	])
 
     await this.save()
-	const res = this.db.exec(allTransactions(`WHERE Transactions.id = ?`), [t.id])
+	const res = this.db.exec(allTransactions(`WHERE Transactions.id = ?`), [transaction.id ?? 0])
 
     if (!res.length)
         return {}
 
-	const transaction = createObjFromArray(res[0])[0]
+	const updated_transaction = createObjFromArray(res[0])[0]
 
-    return transaction
+    return updated_transaction
 }

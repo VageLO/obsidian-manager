@@ -1,16 +1,21 @@
+import { CustomError, Tag } from 'types';
 import { ManagerDatabase } from '..'
 import { createObjFromArray } from './dbHelpers';
 
-export async function listTags(this: ManagerDatabase) {
-	const res = this.db.exec("SELECT * FROM Tags")
+export async function listTags(
+	this: ManagerDatabase
+): Promise<Tag[]> {
+	const res = this.db.exec("SELECT * FROM Tags ORDER BY title ASC")
     if (!res.length)
         return []
 	const tags = createObjFromArray(res[0])
-
     return tags
 }
 
-export async function updateTag(this: ManagerDatabase, tag: any) {
+export async function updateTag(
+	this: ManagerDatabase,
+	tag: Tag
+): Promise<Tag | CustomError> {
 	try {
 		this.db.exec(`UPDATE Tags SET title = ? WHERE id = ?`,
 		[
@@ -32,7 +37,10 @@ export async function updateTag(this: ManagerDatabase, tag: any) {
 	return updated_tag
 }
 
-export async function createTag(this: ManagerDatabase, tag: any) {
+export async function createTag(
+	this: ManagerDatabase,
+	tag: Tag
+): Promise<Tag | CustomError> {
 	try {
 		this.db.run(`INSERT INTO Tags (title) VALUES (?)`, [tag.title])
 	} catch (e) {
@@ -52,7 +60,10 @@ export async function createTag(this: ManagerDatabase, tag: any) {
 	return new_tag
 }
 
-export async function deleteTag(this: ManagerDatabase, id: number) {
+export async function deleteTag(
+	this: ManagerDatabase,
+	id: number
+): Promise<number> {
 	try {
 		this.db.run(`DELETE FROM Tags WHERE id = ?`, [id])
 		await this.save()

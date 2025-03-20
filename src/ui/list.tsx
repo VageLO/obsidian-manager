@@ -56,7 +56,6 @@ export const List = () => {
 	})
 
     useEffect(() => {
-		console.log('list')
 		countTotal(grandTotal.type)
 		if (contextMenu.clicked) {
 			document.addEventListener('click', handleClose)
@@ -85,10 +84,14 @@ export const List = () => {
 		let mouseY: number = event.clientY - 45;
 
 		const leaf = db.app.workspace.getLeavesOfType('file-explorer')[0];
-		if (!leaf.parent.parent.collapsed) {
-			const navEl = leaf.view.containerEl.querySelector('.nav-files-container');
-			const rect = navEl.getBoundingClientRect();
-			mouseX -= rect.width
+		if ('collapsed' in leaf.parent.parent) {
+			if (!leaf.parent.parent['collapsed']) {
+				const navEl = leaf.view.containerEl.querySelector('.nav-files-container');
+				if (navEl) {
+					const rect = navEl.getBoundingClientRect();
+					mouseX -= rect.width
+				}
+			}
 		}
 
 		event.preventDefault();

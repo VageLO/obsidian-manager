@@ -1,17 +1,21 @@
+import { Account, CustomError } from 'types';
 import { ManagerDatabase } from '..'
 import { createObjFromArray } from './dbHelpers';
 
-export async function listAccounts(this: ManagerDatabase) {
-	const res = this.db.exec("SELECT * FROM Accounts")
+export async function listAccounts(
+	this: ManagerDatabase
+): Promise<Account[]> {
+	const res = this.db.exec("SELECT * FROM Accounts ORDER BY title ASC")
     if (!res.length)
         return []
 	const accounts = createObjFromArray(res[0])
-
 	return accounts
 }
 
-export async function updateAccount(this: ManagerDatabase, account: any) {
-
+export async function updateAccount(
+	this: ManagerDatabase,
+	account: Account
+): Promise<Account | CustomError> {
 	try {
 		this.db.exec(`UPDATE Accounts SET title = ?, currency = ?, balance = ? WHERE id = ?`,
 		[
@@ -36,7 +40,10 @@ export async function updateAccount(this: ManagerDatabase, account: any) {
 }
 
 
-export async function createAccount(this: ManagerDatabase, account: any) {
+export async function createAccount(
+	this: ManagerDatabase,
+	account: Account
+): Promise<Account | CustomError> {
 	try {
 		this.db.run(`INSERT INTO Accounts (title, currency, balance) VALUES (?, ?, ?)`, [
 			account.title,
@@ -60,7 +67,10 @@ export async function createAccount(this: ManagerDatabase, account: any) {
 	return new_account
 }
 
-export async function deleteAccount(this: ManagerDatabase, id: number) {
+export async function deleteAccount(
+	this: ManagerDatabase,
+	id: number
+): Promise<number> {
 	try {
 		this.db.run(`DELETE FROM Accounts WHERE id = ?`, [id])
 		await this.save()

@@ -67,14 +67,14 @@ export async function tagModal(this: EditModal) {
 
 				if (tag.id) {
 					res = await this.database.updateTag(tag)
-					if (res.error) {
+					if ('error' in res) {
 						this.validate(res.detail, fields)
 						return
 					}
 					this.data = { update: res }
 				} else {
 					res = await this.database.createTag(tag)
-					if (res.error) {
+					if ('error' in res) {
 						this.validate(res.detail, fields)
 						return
 					}

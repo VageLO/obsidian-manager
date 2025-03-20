@@ -14,7 +14,6 @@ export const Header = () => {
 		db
 	} = useResourcesContext()
 
-	console.log(categories)
 	useEffect(() => {
 		const fetchData = async(
 			account: any,
@@ -34,7 +33,6 @@ export const Header = () => {
 			byMonth != prevFilter.byMonth ||
 			byYear != prevFilter.byYear
 		)
-			console.log('header-filter-call')
 			fetchData(byAccount, byCategory, byTag, byMonth, byYear)
 	}, [
 			filter,

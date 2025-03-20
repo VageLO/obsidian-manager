@@ -1,17 +1,21 @@
+import { Category, CustomError } from 'types';
 import { ManagerDatabase } from '..'
 import { createObjFromArray } from './dbHelpers';
 
-export async function listCategories(this: ManagerDatabase) {
-	const res = this.db.exec("SELECT * FROM Categories")
+export async function listCategories(
+	this: ManagerDatabase
+): Promise<Category[]> {
+	const res = this.db.exec("SELECT * FROM Categories ORDER BY title ASC")
     if (!res.length)
         return []
 	const categories = createObjFromArray(res[0])
-
     return categories
 }
 
-export async function updateCategory(this: ManagerDatabase, category: any) {
-
+export async function updateCategory(
+	this: ManagerDatabase,
+	category: Category
+): Promise<Category | CustomError>{
 	try {
 		this.db.exec(`UPDATE Categories SET title = ?, parent_id = ? WHERE id = ?`,
 		[
@@ -35,7 +39,10 @@ export async function updateCategory(this: ManagerDatabase, category: any) {
 }
 
 
-export async function createCategory(this: ManagerDatabase, category: any) {
+export async function createCategory(
+	this: ManagerDatabase,
+	category: Category
+): Promise<Category | CustomError> {
 	try {
 		this.db.run(`INSERT INTO Categories (title, parent_id) VALUES (?, ?)`, [
 			category.title,
@@ -58,7 +65,10 @@ export async function createCategory(this: ManagerDatabase, category: any) {
 	return new_category
 }
 
-export async function deleteCategory(this: ManagerDatabase, id: number) {
+export async function deleteCategory(
+	this: ManagerDatabase,
+	id: number
+): Promise<number> {
 	try {
 		this.db.run(`DELETE FROM Categories WHERE id = ?`, [id])
 		await this.save()

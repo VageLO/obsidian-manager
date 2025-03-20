@@ -2,8 +2,6 @@ import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { Root, createRoot } from 'react-dom/client';
 import { Tabs } from './tabs';
 import { ResourceProvider } from './resourcesProvider';
-import { ManagerDatabase } from 'database';
-import { ManagerAPIDatabase } from 'api';
 import { DatabaseInterface } from 'types';
 
 export const VIEW_TYPE = 'manager-view';
